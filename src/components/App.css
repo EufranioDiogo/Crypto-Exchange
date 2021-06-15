@@ -1,0 +1,26 @@
+/* Styles go here */
+
+.navbar {
+    height: 50px;
+}
+
+.navbar-brand {
+    font-size: 30px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+#account {
+    font-size: 14px;
+    color: #333333;
+}
+
+.col-lg-12 {
+    margin-top: 80px;
+    
+}
+
+#tokenSelect {
+    border: none;
+    background-color: #e6e6e6;
+    border-block-end-style: none;
+}

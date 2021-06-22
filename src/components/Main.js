@@ -16,10 +16,16 @@ class Main extends Component {
     if (this.state.currentForm === 'buy'){
         content = <BuyForm ethBalance={this.props.ethBalance}
                     tokenBalance={this.props.tokenBalance}
+                    tokenBalance1={this.props.tokenBalance1}
+                    tokenBalance2={this.props.tokenBalance2}
+                    tokenBalance3={this.props.tokenBalance3}
                     buyTokens={this.props.buyTokens}/>
     } else {
         content = <SellForm ethBalance={this.props.ethBalance}
                     tokenBalance={this.props.tokenBalance}
+                    tokenBalance1={this.props.tokenBalance1}
+                    tokenBalance2={this.props.tokenBalance2}
+                    tokenBalance3={this.props.tokenBalance3}
                     sellTokens={this.props.sellTokens}/>
     }
     return (

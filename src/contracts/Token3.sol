@@ -7,6 +7,8 @@ contract Token3
     string public symbol = "UCANE";
     uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
+    uint  public umToken3EquivaleQuantosToken1 = 0;
+    uint  public umToken3EquivaleQuantosToken2 = 0;
 
     event Transfer(
         address indexed _from,
@@ -57,5 +59,20 @@ contract Token3
 
     function getTokenSymbol() public view returns(string memory) {
         return symbol;
+    }
+
+    function setUmToken3EquivaleQuantosToken1(uint new_value) public {
+        umToken3EquivaleQuantosToken1 = new_value;
+    }
+
+    function setUmToken3EquivaleQuantosToken2(uint new_value) public {
+        umToken3EquivaleQuantosToken2 = new_value;
+    }
+
+    function getUmToken3EquivaleQuantosToken1() public returns (uint) {
+        return umToken3EquivaleQuantosToken1;
+    }
+    function getUmToken3EquivaleQuantosToken2() public returns (uint) {
+        return umToken3EquivaleQuantosToken2;
     }
 }

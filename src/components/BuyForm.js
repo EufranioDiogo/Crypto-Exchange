@@ -22,12 +22,18 @@ class BuyForm extends Component {
             this.props.buyTokens(etherAmount)
             console.log("purchasing tokens...")
             }}>
+
             <div>
                 <label className="float-left mb-90"><b>Input</b></label>
                 <span className="float-right text-muted">
-                    Saldo: {window.web3.utils.fromWei(this.props.ethBalance, 'Ether')}
+                    SaldoEth: {window.web3.utils.fromWei(this.props.ethBalance, 'Ether')}
+                    Saldo UCN: {window.web3.utils.fromWei(this.props.tokenBalance1, 'Ether')}
+                    Saldo INF: {window.web3.utils.fromWei(this.props.ethBalance, 'Ether')}
+                    Saldo SLI: {window.web3.utils.fromWei(this.props.ethBalance, 'Ether')}
                 </span>
             </div>
+
+
             <div className="input-group mb-4">
                 <input type="text"
                 onChange={(event) => {

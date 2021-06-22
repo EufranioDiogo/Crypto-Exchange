@@ -5,31 +5,35 @@ import "./Token.sol";
 import "./Token2.sol";
 import "./Token3.sol";
 
+
+
 contract EthSwap
 {
+
+
     string public name = "EthSwap Instant Exchange";
-    Token public token;
+    Token public token1;
     Token2 public token2;
     Token3 public token3;
     uint public rate = 100;
 
     event TokensPurchased(
         address account,
-        address token,
+        address token1,
         uint amount,
         uint rate
     );
 
     event TokensSold(
         address account,
-        address token,
+        address token1,
         uint amount,
         uint rate
     );
 
-    constructor(Token _token, Token2 _token2, Token3 _token3) public 
+    constructor(Token _token, Token2 _token2, Token3 _token3)
     {
-        token = _token;
+        token1 = _token;
         token2 = _token2;
         token3 = _token3;
     }
@@ -40,35 +44,33 @@ contract EthSwap
         uint tokenAmount = msg.value * rate;
 
         // Require that EthSwap has enough tokens
-        require(token.balanceOf(address(this)) >= tokenAmount);
+        require(token1.balanceOf(address(this)) >= tokenAmount);
 
         // Transfer tokens to the user
-        token.transfer(msg.sender, tokenAmount);
+        token1.transfer(msg.sender, tokenAmount);
 
         // Emit an event
-        emit TokensPurchased(msg.sender, address(token), tokenAmount, rate);
+        emit TokensPurchased(msg.sender, address(token1), tokenAmount, rate);
     }
 
-    function sellTokens(uint _amount) public
+    function sellTokens(uint _amount) public payable
     {
-        if (msg.sender == address(token)) {
-            // User can't sell more tokens than they have
-            require(token.balanceOf(msg.sender) >= _amount);
+        // User can't sell more tokens than they have
+        require(token1.balanceOf(msg.sender) >= _amount);
 
-            // Calculate the amount of Ether to redeem
-            uint etherAmount = _amount / rate;
+        // Calculate the amount of Ether to redeem
+        uint etherAmount = _amount / rate;
 
-            // Require that EthSwap has enough tokens
-            require(address(this).balance >= etherAmount);
-            
-            // Perform sale
-            token.transferFrom(msg.sender, address(this), _amount);
-
-            msg.sender.transfer(etherAmount);
-
-            // Emit an event
-            emit TokensSold(msg.sender, address(token), _amount, rate);
-        }
+        // Require that EthSwap has enough tokens
+        require(address(this).balance >= etherAmount);
         
+        // Perform sale
+        token1.transferFrom(msg.sender, address(this), _amount);
+
+        msg.sender.transfer(etherAmount);
+
+        // Emit an event
+        emit TokensSold(msg.sender, address(token1), _amount, rate);
+    
     }
 }

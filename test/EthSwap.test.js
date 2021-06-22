@@ -1,4 +1,6 @@
 const Token = artifacts.require('Token')
+const Token2 = artifacts.require('Token2')
+const Token3 = artifacts.require('Token3')
 const EthSwap = artifacts.require('EthSwap')
 
 require('chai')
@@ -11,20 +13,32 @@ function tokens(n) {
 
 contract('EthSwap', ([deployer, investor]) => {
   
-    let token, ethSwap
+    let token, token2, token3, ethSwap;
 
     before(async () => {
         token = await Token.new()
-        ethSwap = await EthSwap.new(token.address)
+        token2 = await Token2.new();
+        token3 = await Token3.new();
+        ethSwap = await EthSwap.new(token.address, token2.address, token3.address)
         
         // Transfer all tokens to EthSwap (1 million)
         await token.transfer(ethSwap.address, tokens('1000000'))
+        await token2.transfer(ethSwap.address, tokens('1000000'))
+        await token3.transfer(ethSwap.address, tokens('1000000'))
     })
 
     describe('Token deployment', async () => {
         it('contract has a name', async () => {
             const name = await token.name()
-            assert.equal(name, 'UCAN Token')
+            assert.equal(name, 'UCANA Token')
+        })
+        it('contract has a name', async () => {
+            const name = await token2.name()
+            assert.equal(name, 'UCANU Token')
+        })
+        it('contract has a name', async () => {
+            const name = await token3.name()
+            assert.equal(name, 'UCANE Token')
         })
     })
   

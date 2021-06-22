@@ -7,6 +7,8 @@ contract Token2
     string public symbol = "UCANU";
     uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
+    uint  public umToken2EquivaleQuantosToken1 = 0;
+    uint  public umToken2EquivaleQuantosToken3 = 0;
 
     event Transfer(
         address indexed _from,
@@ -57,5 +59,20 @@ contract Token2
 
     function getTokenSymbol() public view returns(string memory) {
         return symbol;
+    }
+    
+    function setUmToken2EquivaleQuantosToken1(uint new_value) public {
+        umToken2EquivaleQuantosToken1 = new_value;
+    }
+
+    function setUmToken2EquivaleQuantosToken3(uint new_value) public {
+        umToken2EquivaleQuantosToken3 = new_value;
+    }
+
+    function getUmToken2EquivaleQuantosToken1() public returns (uint) {
+        return umToken2EquivaleQuantosToken1;
+    }
+    function getUmToken2EquivaleQuantosToken3() public returns (uint) {
+        return umToken2EquivaleQuantosToken3;
     }
 }

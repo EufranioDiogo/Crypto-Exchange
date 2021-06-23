@@ -1,14 +1,14 @@
 //SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.4.16 <0.9.0;
- 
+  
 contract Token2
 {
     string public name = "UCANU Token";
     string public symbol = "UCANU";
     uint256 public totalSupply = 1500000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
-    uint  public umToken2EquivaleQuantosToken1 = 0;
-    uint  public umToken2EquivaleQuantosToken3 = 0;
+    uint256  public umToken2EquivaleQuantosToken1 = 0;
+    uint256  public umToken2EquivaleQuantosToken3 = 0;
 
     event Transfer(
         address indexed _from,
@@ -61,18 +61,18 @@ contract Token2
         return symbol;
     }
     
-    function setUmToken2EquivaleQuantosToken1(uint new_value) external {
+    function setUmToken2EquivaleQuantosToken1(uint256 new_value) external {
         umToken2EquivaleQuantosToken1 = new_value;
     }
 
-    function setUmToken2EquivaleQuantosToken3(uint new_value) external {
+    function setUmToken2EquivaleQuantosToken3(uint256 new_value) external {
         umToken2EquivaleQuantosToken3 = new_value;
     }
 
-    function getUmToken2EquivaleQuantosToken1() external returns (uint) {
+    function getUmToken2EquivaleQuantosToken1() external returns (uint256) {
         return umToken2EquivaleQuantosToken1;
     }
-    function getUmToken2EquivaleQuantosToken3() external returns (uint) {
+    function getUmToken2EquivaleQuantosToken3() external returns (uint256) {
         return umToken2EquivaleQuantosToken3;
     }
     function balanceOfToken(address _owner) public view returns (uint256) {

@@ -9,14 +9,20 @@ const Web3 = require('web3');
 const mongodb = require('mongodb').MongoClient;
 const contract = require('truffle-contract');
 const artifacts = require('./src/abis/EthSwap.json');
+const ganache = require('ganache');
 let web3;
+
+web3 = new Web3(ganache.provider(), null, {transactionConfirmationBlocks: 1});
 app.use(express.json());
 
-if (typeof web3 !== 'undefined') {
-    web3 = new Web3(web3.currentProvider)
-  } else {
-    web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'))
-}
+
+// if (typeof web3 !== 'undefined') {
+//     web3 = new Web3(web3.currentProvider);
+//   } else {
+//     web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'));
+// }
+
+
 const LMS = contract(artifacts)
 LMS.setProvider(web3.currentProvider)
 

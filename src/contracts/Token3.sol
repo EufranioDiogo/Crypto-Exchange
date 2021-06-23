@@ -7,8 +7,8 @@ contract Token3
     string public symbol = "UCANE";
     uint256 public totalSupply = 1500000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
-    uint  public umToken3EquivaleQuantosToken1 = 0;
-    uint  public umToken3EquivaleQuantosToken2 = 0;
+    uint256  public umToken3EquivaleQuantosToken1 = 0;
+    uint256  public umToken3EquivaleQuantosToken2 = 0;
 
     event Transfer(
         address indexed _from,
@@ -33,6 +33,7 @@ contract Token3
     function transfer(address _to, uint256 _value) external returns (bool success)
     {
         //require(balanceOf[msg.sender] >= _value);
+        
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
         emit Transfer(msg.sender, _to, _value);
@@ -61,18 +62,18 @@ contract Token3
         return symbol;
     }
 
-    function setUmToken3EquivaleQuantosToken1(uint new_value) external {
+    function setUmToken3EquivaleQuantosToken1(uint256 new_value) external {
         umToken3EquivaleQuantosToken1 = new_value;
     }
 
-    function setUmToken3EquivaleQuantosToken2(uint new_value) external {
+    function setUmToken3EquivaleQuantosToken2(uint256 new_value) external {
         umToken3EquivaleQuantosToken2 = new_value;
     }
 
-    function getUmToken3EquivaleQuantosToken1() external returns (uint) {
+    function getUmToken3EquivaleQuantosToken1() external returns (uint256) {
         return umToken3EquivaleQuantosToken1;
     }
-    function getUmToken3EquivaleQuantosToken2() external returns (uint) {
+    function getUmToken3EquivaleQuantosToken2() external returns (uint256) {
         return umToken3EquivaleQuantosToken2;
     }
     function balanceOfToken(address _owner) public view returns (uint256) {

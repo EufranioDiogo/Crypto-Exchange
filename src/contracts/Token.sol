@@ -8,8 +8,8 @@ contract Token
     uint256 public totalSupply = 1500000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
 
-    uint  public umToken1EquivaleQuantosToken2 = 0;
-    uint  public umToken1EquivaleQuantosToken3 = 0;
+    uint256  public umToken1EquivaleQuantosToken2 = 0;
+    uint256  public umToken1EquivaleQuantosToken3 = 0;
 
     event Transfer(
         address indexed _from,
@@ -62,19 +62,19 @@ contract Token
         return symbol;
     }
 
-    function setUmToken1EquivaleQuantosToken2(uint new_value) external {
+    function setUmToken1EquivaleQuantosToken2(uint256 new_value) external {
         umToken1EquivaleQuantosToken2 = new_value;
     }
 
-    function setUmToken1EquivaleQuantosToken3(uint new_value) external {
+    function setUmToken1EquivaleQuantosToken3(uint256 new_value) external {
         umToken1EquivaleQuantosToken3 = new_value;
     }
 
-    function getUmToken1EquivaleQuantosToken2() external returns (uint) {
+    function getUmToken1EquivaleQuantosToken2() external returns (uint256) {
         return umToken1EquivaleQuantosToken2;
     }
 
-    function getUmToken1EquivaleQuantosToken3() external returns (uint) {
+    function getUmToken1EquivaleQuantosToken3() external returns (uint256) {
         return umToken1EquivaleQuantosToken3;
     }
 

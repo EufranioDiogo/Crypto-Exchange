@@ -19,9 +19,13 @@ module.exports = async function(deployer) {
     const ethSwap = await EthSwap.deployed()
 
     // Transfer all tokens to EthSwap (1 million)
-    await token.transfer(ethSwap.address, '1000000000000000000000000')
-    await token2.transfer(ethSwap.address, '1000000000000000000000000')
-    await token3.transfer(ethSwap.address, '1000000000000000000000000')
+    await token.transfer(ethSwap.address,  '1000000' + '000000000000000000')
+    await token2.transfer(ethSwap.address, '1000000' + '000000000000000000')
+    await token3.transfer(ethSwap.address, '1000000' + '000000000000000000')
+
+    console.log('Amount: ')
+    console.log((await token.balanceOf(ethSwap.address)).toString());
+
 
 
     const accounts = [
@@ -131,6 +135,8 @@ module.exports = async function(deployer) {
       const quantTokens1ToAccounts = '10' + '000000000000000000';
       const quantTokens2ToAccounts = '10' + '000000000000000000';
       const quantTokens3ToAccounts = '10' + '000000000000000000';
+
+      console.log(quantTokens1ToAccounts)
 
       for (let accountIndex = 0; accountIndex < accounts.length - 95; accountIndex++) {
         await token.transfer( accounts[accountIndex], quantTokens1ToAccounts)

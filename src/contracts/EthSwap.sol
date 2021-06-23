@@ -9,6 +9,7 @@ import "./Token3.sol";
 
 contract EthSwap
 {
+    using SafeMath for uint256;
     string public name = "EthSwap Instant Exchange";
     Token public token1;
     Token2 public token2;
@@ -17,7 +18,9 @@ contract EthSwap
     uint256 constant WAD = 10**18;
     uint256 idPivo = 0;
     uint rangeLimit = 10;
+    address public owner;
     mapping(address => uint256) public balanceOfToken1;
+
 
     event TokensPurchased(
         address account,
@@ -38,52 +41,57 @@ contract EthSwap
         token1 = _token;
         token2 = _token2;
         token3 = _token3;
+        owner = msg.sender;
     }
 
 
     function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
         if (keccak256(bytes(orig)) == keccak256("UCANA")) {
-            token1.transferFrom(_from, _to, amount * WAD);
+            amount = amount * WAD;
+
+            token1.transferFrom(_from, _to, amount);
 
             if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                token2.transfer(_from, token1.getUmToken1EquivaleQuantosToken2() * amount * WAD);
+                token2.transfer(_from, token1.getUmToken1EquivaleQuantosToken2() * amount);
             } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                token3.transfer(_from, token1.getUmToken1EquivaleQuantosToken3() * amount * WAD);
+                token3.transfer(_from, token1.getUmToken1EquivaleQuantosToken3() * amount);
             }
         }
         else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
-            token2.transferFrom(_from, _to, amount * WAD);
+            token2.transferFrom(_from, _to, amount);
 
             if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                token1.transfer(_from, token2.getUmToken2EquivaleQuantosToken1() * amount * WAD);
+                token1.transfer(_from, token2.getUmToken2EquivaleQuantosToken1() * amount);
             } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                token3.transfer(_from, token2.getUmToken2EquivaleQuantosToken3() * amount * WAD);
+                token3.transfer(_from, token2.getUmToken2EquivaleQuantosToken3() * amount);
             }
         }
         else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
-            token3.transferFrom(_from, _to, amount * WAD);
+            token3.transferFrom(_from, _to, amount);
 
             if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                token1.transfer(_from, token3.getUmToken3EquivaleQuantosToken1() * amount * WAD);
+                token1.transfer(_from, token3.getUmToken3EquivaleQuantosToken1() * amount);
             } else if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                token2.transfer(_from, token3.getUmToken3EquivaleQuantosToken2() * amount * WAD);
+                token2.transfer(_from, token3.getUmToken3EquivaleQuantosToken2() * amount);
             }
         }
+        sortPivo();
     }
 
 
     // function to give the right price value
 
     function sortPivo() private {
-        uint sorted = random(rangeLimit)+1;
-        uint equivalencia1 = (random(rangeLimit))+1;
-        uint equivalencia2 = (random(rangeLimit))+1;
+        uint256 sorted = random(rangeLimit)+1;
+
+        uint256 equivalencia1 = ((random(rangeLimit)) + 1) * WAD ;
+        uint256 equivalencia2 = ((random(rangeLimit)) + 1) * WAD;
 
         if (sorted <= 2) {
             // Token1 is the pivo
             
-            token1.setUmToken1EquivaleQuantosToken2(equivalencia1 * WAD);
-            token1.setUmToken1EquivaleQuantosToken3(equivalencia2 * WAD);
+            token1.setUmToken1EquivaleQuantosToken2(equivalencia1);
+            token1.setUmToken1EquivaleQuantosToken3(equivalencia2);
 
             token2.setUmToken2EquivaleQuantosToken1(wdiv(1, equivalencia1));
             token3.setUmToken3EquivaleQuantosToken1(wdiv(1, equivalencia2));
@@ -106,8 +114,8 @@ contract EthSwap
         } else {
             // Token3 is the pivo
             
-            token3.setUmToken3EquivaleQuantosToken1(equivalencia1 * WAD);
-            token3.setUmToken3EquivaleQuantosToken2(equivalencia2 * WAD);
+            token3.setUmToken3EquivaleQuantosToken1(equivalencia1);
+            token3.setUmToken3EquivaleQuantosToken2(equivalencia2);
 
             token1.setUmToken1EquivaleQuantosToken3(wdiv(1, equivalencia1));
             token2.setUmToken2EquivaleQuantosToken3(wdiv(1, equivalencia2));
@@ -157,6 +165,10 @@ contract EthSwap
     }
 
     function getBalanceOfToken3() public returns (uint256) {
+        return token3.balanceOfToken(msg.sender);
+    }
+
+    function getBalanceOfTotal() public returns (uint256) {
         return token3.balanceOfToken(msg.sender);
     }
 }

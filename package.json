@@ -20,6 +20,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "ganache": "^6.4.4",
+    "ganache-cli": "^6.12.2",
     "identicon.js": "^2.3.3",
     "ipfs-http-client": "^50.1.2",
     "mongodb": "^3.6.9",

@@ -33,7 +33,11 @@ function routes(app, dbUsers, lms, accounts, web3) {
     app.post('/swap', async (req, res) => {
         const idEstudante = req.body.idEstudante;
 
-        dbUser.findOne({ idEstudante }).then((data) => {
+
+        dbUser.findOne({ idEstudante: idEstudante }).then((data) => {
+
+            console.log(data);
+
             const privateKey = req.body.privateKey;
 
             if (privateKey != data.privateKey) {
@@ -44,6 +48,25 @@ function routes(app, dbUsers, lms, accounts, web3) {
             } else {
                 const origCrypto = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
                 const destCrypto = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
+
+
+                const idConta = req.body.idConta;
+                const amount = req.body.amount;
+
+
+                exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto)
+                    .send({ from: idConta, gas: "220000" })
+                    .then((result) => {
+                        console.log(result);
+                        res.status(200).json({
+                            "message": result
+                        })
+                    }).catch(function (err) {
+                        console.log('err...\n' + err);
+                        res.status(200).json({
+                            "message": err
+                        })
+                    })
 
                 if (origCrypto != 'UCANU' && origCrypto != 'UCANA' && origCrypto != 'UCANE') {
                     res.status(400).json({
@@ -68,31 +91,29 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     const idConta = req.body.idConta;
                     const amount = parseInt(req.body.amount);
 
-                    exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto).send({ from: idConta, gas: 0, gasPrice: 0}).then((result) => {
-                        console.log(result);
-                        res.status(200).json({
-                            "message": result
+
+                    exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto)
+                        .send({ from: idConta, value: web3.utils.toWei(amount, "ether"), gas: "220000" })
+                        .then((result) => {
+                            console.log(result);
+                            res.status(200).json({
+                                "message": result
+                            })
+                        }).catch(function (err) {
+                            console.log('err...\n' + err);
+                            res.status(200).json({
+                                "message": err
+                            })
                         })
-                    }).catch(function(err){
-                        console.log('err...\n'+err);
-                        res.status(200).json({
-                            "message": err
-                        })
-                    })
                 }
 
-
-
-                /*
-                lms.sendIPFS(id, hash, {from: accounts[0]})
-                .then((_hash, _address)=>{
-                    exchange.insertOne({id, hash, title, name})
-                    res.json({"status":"success", id})
-                })
-                .catch(err => {
-                    res.status(500).json({"status":"Failed", "reason":"Upload error occured"})
-                })*/
             }
+
+            res.status(200).json({
+                "status": "saiu",
+                "message": "bae"
+            })
+
         }).catch((error) => {
             res.status(404).json({
                 "status": "error",
@@ -100,6 +121,9 @@ function routes(app, dbUsers, lms, accounts, web3) {
             })
         })
     })
+
+
+
 
     app.post('/register', (req, res) => {
         const idEstudante = req.body.idEstudante;
@@ -120,72 +144,32 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
         if (idEstudante && nome && sobrenome && idConta && privateKey && email) {
             dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey, email })
-            .then(data => {
-                if (data != null) {
+                .then(data => {
+                    if (data != null) {
+                        res.status(400).json({
+                            "status": 400,
+                            "message": "User already exist"
+                        });
+                    } else {
+                        dbUser.insertOne(user);
+                        res.status(200).json({
+                            "status": 200,
+                            "userDetails": user,
+                            "createdAt": new Date().getTime()
+                        })
+                    }
+                }).catch(error => {
                     res.status(400).json({
                         "status": 400,
-                        "message": "User already exist"
+                        "message": error
                     });
-                } else {
-                    dbUser.insertOne(user);
-                    res.status(200).json({
-                        "status": 200,
-                        "userDetails": user,
-                        "createdAt": new Date().getTime()
-                    })
-                }
-            }).catch(error => {
-                res.status(400).json({
-                    "status": 400,
-                    "message": error
-                });
-            })
+                })
         } else {
             res.status(400).json({ "status": "Failed", "reason": "wrong input" })
         }
     })
 
-    app.get('/balanceToken1', (req, res) => {
-        exchangeContract.methods.getBalanceOfToken1().call({ from: req.idConta}).then((result) => {
-            console.log(result);
-            res.status(200).json({
-                "message": result
-            })
-        }).catch(function(err){
-            console.log('err...\n'+err);
-            res.status(200).json({
-                "message": err
-            })
-        })
-    })
 
-    app.get('/balanceToken2', (req, res) => {
-        exchangeContract.methods.getBalanceOfToken2().call({ from: req.idConta}).then((result) => {
-            console.log(result);
-            res.status(200).json({
-                "message": result
-            })
-        }).catch(function(err){
-            console.log('err...\n'+err);
-            res.status(200).json({
-                "message": err
-            })
-        })
-    })
-
-    app.get('/balanceToken3', (req, res) => {
-        exchangeContract.methods.getBalanceOfToken3().call({ from: req.idConta}).then((result) => {
-            console.log(result);
-            res.status(200).json({
-                "message": result
-            })
-        }).catch(function(err){
-            console.log('err...\n'+err);
-            res.status(200).json({
-                "message": err
-            })
-        })
-    })
 
     app.get('/getData', (req, res) => {
         const email = req.body.email

@@ -19,14 +19,16 @@ module.exports = async function(deployer) {
     const ethSwap = await EthSwap.deployed()
 
     // Transfer all tokens to EthSwap (1 million)
-    await token.transfer(ethSwap.address,  '1000000' + '000000000000000000')
-    await token2.transfer(ethSwap.address, '1000000' + '000000000000000000')
-    await token3.transfer(ethSwap.address, '1000000' + '000000000000000000')
+    await token.transfer(ethSwap.address,  '1000000000000000000000000');
+    await token2.transfer(ethSwap.address, '1000000000000000000000000');
+    await token3.transfer(ethSwap.address, '1000000000000000000000000');
 
-    console.log('Amount: ')
+    console.log('Quant tokens 1 exchange')
     console.log((await token.balanceOf(ethSwap.address)).toString());
-
-
+    console.log('Quant tokens 2 exchange')
+    console.log((await token2.balanceOf(ethSwap.address)).toString());
+    console.log('Quant tokens 3 exchange')
+    console.log((await token3.balanceOf(ethSwap.address)).toString());
 
     const accounts = [
         '0x53162D805b8E3A8b3914952fE10853b9F227Fe90',
@@ -132,11 +134,9 @@ module.exports = async function(deployer) {
       ];
 
       // Meio milhão, valor máximo a ser distribuido 5000 por conta
-      const quantTokens1ToAccounts = '10' + '000000000000000000';
-      const quantTokens2ToAccounts = '10' + '000000000000000000';
-      const quantTokens3ToAccounts = '10' + '000000000000000000';
-
-      console.log(quantTokens1ToAccounts)
+      const quantTokens1ToAccounts = '2000' + '000000000000000000';
+      const quantTokens2ToAccounts = '2000' + '000000000000000000';
+      const quantTokens3ToAccounts = '2000' + '000000000000000000';
 
       for (let accountIndex = 0; accountIndex < accounts.length - 95; accountIndex++) {
         await token.transfer( accounts[accountIndex], quantTokens1ToAccounts)

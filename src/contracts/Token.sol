@@ -1,12 +1,13 @@
 //SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.4.16 <0.9.0;
-
+ 
 contract Token
 {
     string public name = "UCANA Token";
     string public symbol = "UCANA";
-    uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
+    uint256 public totalSupply = 1500000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
+
     uint  public umToken1EquivaleQuantosToken2 = 0;
     uint  public umToken1EquivaleQuantosToken3 = 0;
 
@@ -30,26 +31,26 @@ contract Token
         balanceOf[msg.sender] = totalSupply;
     }
 
-    function transfer(address _to, uint256 _value) public payable returns (bool success)
+    function transfer(address _to, uint256 _value) external returns (bool success)
     {
-        require(balanceOf[msg.sender] >= _value);
+        //require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
     
-    function approve(address _spender, uint256 _value) public returns (bool success)
+    function approve(address _spender, uint256 _value) external returns (bool success)
     {
         allowance[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
+    function transferFrom(address _from, address _to, uint256 _value) external returns (bool success)
     {
-        require(_value <= balanceOf[_from]);
-        require(_value <= allowance[_from][msg.sender]);       
+        //require(_value <= balanceOf[_from]);
+        //require(_value <= allowance[_from][msg.sender]);       
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         allowance[_from][msg.sender] -= _value;
@@ -61,19 +62,23 @@ contract Token
         return symbol;
     }
 
-    function setUmToken1EquivaleQuantosToken2(uint new_value) public {
+    function setUmToken1EquivaleQuantosToken2(uint new_value) external {
         umToken1EquivaleQuantosToken2 = new_value;
     }
 
-    function setUmToken1EquivaleQuantosToken3(uint new_value) public {
+    function setUmToken1EquivaleQuantosToken3(uint new_value) external {
         umToken1EquivaleQuantosToken3 = new_value;
     }
 
-    function getUmToken1EquivaleQuantosToken2() public returns (uint) {
+    function getUmToken1EquivaleQuantosToken2() external returns (uint) {
         return umToken1EquivaleQuantosToken2;
     }
 
-    function getUmToken1EquivaleQuantosToken3() public returns (uint) {
+    function getUmToken1EquivaleQuantosToken3() external returns (uint) {
         return umToken1EquivaleQuantosToken3;
+    }
+
+    function balanceOfToken(address _owner) public view returns (uint256) {
+        return balanceOf[_owner];
     }
 }

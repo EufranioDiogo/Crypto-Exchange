@@ -37,7 +37,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
         dbUser.findOne({ idEstudante: idEstudante }).then((data) => {
 
             console.log(data);
-
             const privateKey = req.body.privateKey;
 
             if (privateKey != data.privateKey) {
@@ -108,11 +107,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 }
 
             }
-
-            res.status(200).json({
-                "status": "saiu",
-                "message": "bae"
-            })
 
         }).catch((error) => {
             res.status(404).json({

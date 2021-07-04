@@ -46,35 +46,10 @@ contract EthSwap
 
 
     function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
-        if (keccak256(bytes(orig)) == keccak256("UCANA")) {
-            amount = amount * WAD;
+        amount = amount * WAD;
 
-            token1.transferFrom(_from, _to, amount);
-
-            if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                token2.transfer(_from, token1.getUmToken1EquivaleQuantosToken2() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                token3.transfer(_from, token1.getUmToken1EquivaleQuantosToken3() * amount);
-            }
-        }
-        else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
-            token2.transferFrom(_from, _to, amount);
-
-            if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                token1.transfer(_from, token2.getUmToken2EquivaleQuantosToken1() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                token3.transfer(_from, token2.getUmToken2EquivaleQuantosToken3() * amount);
-            }
-        }
-        else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
-            token3.transferFrom(_from, _to, amount);
-
-            if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                token1.transfer(_from, token3.getUmToken3EquivaleQuantosToken1() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                token2.transfer(_from, token3.getUmToken3EquivaleQuantosToken2() * amount);
-            }
-        }
+        token1.transferFrom(_from, _to, amount);
+        token2.transfer(_from, amount);
         sortPivo();
     }
 

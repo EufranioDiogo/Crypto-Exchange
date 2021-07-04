@@ -31,8 +31,8 @@ mongodb.connect('mongodb://localhost:27017/exchange_api_database',{ useUnifiedTo
     //console.log(accounts);
     //console.log(lms);
 
-    routes(app,db, lms, accounts, web3)
-    
+    routes(app,db, lms, accounts, web3);
+
     /*app.listen(PORT, () => {
       console.log('listening on port '+ PORT);
       console.log('Your netword 127.0.0.1:'+PORT)
@@ -40,6 +40,6 @@ mongodb.connect('mongodb://localhost:27017/exchange_api_database',{ useUnifiedTo
 
     app.listen(PORT, IP, () => {
        console.log('listening on port '+ PORT);
-       console.log('Your netword '+IP+':'+PORT)
-     })
+       console.log('Your netword ' + IP + ':' + PORT)
+     });
 })

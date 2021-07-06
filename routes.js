@@ -10,12 +10,7 @@ const getCircularReplacer = () => {
         return value;
     };
 };
-
-const shortid = require('short-id')
-const ipfsCliente = require('ipfs-http-client')
-const ipfs = ipfsCliente.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
 const fs = require('fs');
-const { parse, stringify } = require('flatted');
 //const { RESERVED_EVENTS } = require('socket.io/dist/socket');
 
 
@@ -30,13 +25,30 @@ function routes(app, dbUsers, lms, accounts, web3) {
     const exchangeABI = exchangeContractJSON.abi;
     const exchangeContract = new web3.eth.Contract(exchangeABI, exchangeAddress);
 
+    /* Função responsavel para fazer o uma transação, no caso trocar uma determinada
+    quantidade de uma tua crypto moeda por outra com a exchange
+    e de realçar que qualquer chamada dela, ela passa por mecanismos de segurança para
+    evitar burlas ao sistema, como a verificação da private key, o id do estudante 
+    entre outros
+    
+    Como chamar:
+    rota -> http://127.0.0.1:3001/swap 
+    
+    O que passar:
+    {
+        "idEstudante": "string",
+        "idConta": "string, id da conta é fornecido pelo ganache",
+        "privateKey": "string também fornecida pelo ganache",
+        "orig": "string, pode ser (UCANU, UCANA, UCANE)",
+        "dest": "string, pode ser (UCANU, UCANA, UCANE)",
+        "amount": "string, definindo o quanto queremos fazer a de transferència, exemplo: 10, significa 10 unidades da moeda origem que pretendes trocar pela moeda destino"
+    }
+    */
     app.post('/swap', async (req, res) => {
         const idEstudante = req.body.idEstudante;
 
 
-        dbUser.findOne({ idEstudante: idEstudante }).then((data) => {
-
-            console.log(data);
+        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
             const privateKey = req.body.privateKey;
 
             if (privateKey != data.privateKey) {
@@ -48,36 +60,17 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 const origCrypto = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
                 const destCrypto = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
 
-
-                const idConta = req.body.idConta;
-                const amount = req.body.amount;
-
-
-                exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto)
-                    .send({ from: idConta, gas: "220000" })
-                    .then((result) => {
-                        console.log(result);
-                        res.status(200).json({
-                            "message": result
-                        })
-                    }).catch(function (err) {
-                        console.log('err...\n' + err);
-                        res.status(200).json({
-                            "message": err
-                        })
-                    })
-
                 if (origCrypto != 'UCANU' && origCrypto != 'UCANA' && origCrypto != 'UCANE') {
                     res.status(400).json({
                         "status": 400,
-                        "message": "Orig token not founded"
+                        "message": "Orig Token not defined"
                     })
                 }
 
                 if (destCrypto != 'UCANU' && destCrypto != 'UCANA' && destCrypto != 'UCANE') {
                     res.status(400).json({
                         "status": 400,
-                        "message": "Dest token not founded"
+                        "message": "Dest Token not defined"
                     })
                 }
 
@@ -88,30 +81,71 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     })
                 } else {
                     const idConta = req.body.idConta;
-                    const amount = parseInt(req.body.amount);
+                    const amount = req.body.amount; // Passado uma string, exempl: 100 significando 100 unidades da moeda X
+    
+                    const detailsOfTransfer = {
+                        from: idConta,
+                        to: exchangeAddress,
+                        value: amount
+                    }
 
-
-                    exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto)
-                        .send({ from: idConta, value: web3.utils.toWei(amount, "ether"), gas: "220000" })
-                        .then((result) => {
+                    exchangeContract.methods.swap(detailsOfTransfer.to, detailsOfTransfer.from, amount).send(detailsOfTransfer)
+                    .then(async (result) => {
                             console.log(result);
+    
                             res.status(200).json({
                                 "message": result
                             })
-                        }).catch(function (err) {
-                            console.log('err...\n' + err);
-                            res.status(200).json({
-                                "message": err
-                            })
                         })
+                    .catch(async function (err) {
+                        console.log('err...\n' + err);
+    
+                        res.status(200).json({
+                            "message": err
+                        })
+                    })
                 }
-
             }
-
         }).catch((error) => {
             res.status(404).json({
                 "status": "error",
                 "message": "Error user not registred"
+            })
+        })
+    })
+
+    app.get('/balance/:idEstudante', (req, res) => {
+        const idEstudante = req.params.idEstudante;
+        const privateKey = req.body.privateKey;
+        const idConta = req.body.idConta;
+
+        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+            const studentPrivateKey = data.privateKey;
+
+            if (privateKey != studentPrivateKey) {
+                res.status(400).response({
+                    status: 400,
+                    message: 'Error in your authentication'
+                })
+            } else {
+                const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
+                const balanceToken2 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
+                const balanceToken3 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
+
+                res.status(200).response({
+                    status: 200,
+                    message: 'Balances of your account',
+                    balances: {
+                        ucana: balanceToken1,
+                        ucanu: balanceToken2,
+                        ucane: balanceToken3 
+                    }
+                });
+            }
+        }).catch((error) => {
+            res.status(500).response({
+                status: 500,
+                message: ''
             })
         })
     })
@@ -181,89 +215,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
             }).catch(err => {
                 res.status(400).json({ "status": "Failed", "error": err })
             });
-        } else {
-            res.status(400).json({ "status": "Failed", "reason": "wrong input" })
-        }
-    })
-
-
-
-    app.post('/login', (req, res) => {
-        let email = req.body.email
-        if (email) {
-            dbUser.findOne({ email }, (err, doc) => {
-                if (doc) {
-                    res.json({ "status": "success", "id": doc.id })
-                } else {
-                    res.status(400).json({ "status": "Failed", "reason": "Not recognised" })
-                }
-            })
-        } else {
-            res.status(400).json({ "status": "Failed", "reason": "wrong input" })
-        }
-    })
-
-    app.post('/upload', async (req, res) => {
-        let buffer = req.body.buffer
-        let name = req.body.name
-        let title = req.body.title
-        let id = shortid.generate() + shortid.generate()
-
-        if (buffer && title) {
-            let ipfsHash = await ipfs.add(buffer);
-
-            console.log(ipfsHash)
-
-            // let hash = ipfsHash[0].hash
-            let hash = ipfsHash.path;
-
-
-            lms.sendIPFS(id, hash, { from: accounts[0] })
-                .then((_hash, _address) => {
-                    exchange.insertOne({ id, hash, title, name })
-                    res.json({ "status": "success", id })
-                })
-                .catch(err => {
-                    res.status(500).json({ "status": "Failed", "reason": "Upload error occured" })
-                })
-        } else {
-            res.status(400).json({ "status": "Failed", "reason": "wrong input" })
-        }
-    })
-
-    app.get('/access/:email', (req, res) => {
-        if (req.params.email) {
-            dbUsers.findOne({ email: req.body.email }).then(data => {
-                res.json({ "status": "success", data })
-            }).catch((error) => {
-                console.log(error);
-                res.json({ "status": "error", error })
-            })
-        } else {
-            res.status(400).json({ "status": "Failed", "reason": "wrong input" })
-        }
-    })
-
-    app.get('/access/:email/:id', (req, res) => {
-        const id = req.params.id
-        const email = req.params.email;
-
-        if (id && email) {
-            dbUsers.findOne({ email: email }).then(data => {
-                console.log(accounts);
-
-                lms
-                    .getHash(id, { from: accounts[0] })
-                    .then(async (hash) => {
-                        console.log('hash: ' + hash)
-                        let info = await ipfs.files.read(hash)
-                        res.json({ "status": "success", info })
-                    }).catch((error) => {
-                        res.json({ "status": "error", error })
-                    })
-            }).catch(error => {
-                res.status(400).json({ "status": "Failed", "reason": "wrong input" })
-            })
         } else {
             res.status(400).json({ "status": "Failed", "reason": "wrong input" })
         }

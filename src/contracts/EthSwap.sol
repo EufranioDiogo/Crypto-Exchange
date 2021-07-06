@@ -20,6 +20,7 @@ contract EthSwap
     uint rangeLimit = 10;
     address public owner;
     mapping(address => uint256) public balanceOfToken1;
+    string public entrou;
 
 
     event TokensPurchased(
@@ -44,13 +45,17 @@ contract EthSwap
         owner = msg.sender;
     }
 
+    /*
+    
+    */
+    function swap(address  _to, address _from, uint256 amount) public payable {
+        //amount = amount;
 
-    function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
-        amount = amount * WAD;
-
-        token1.transferFrom(_from, _to, amount);
-        token2.transfer(_from, amount);
-        sortPivo();
+        //token1.transferFrom(msg.sender, _to, msg.value);
+        token2.transfer(msg.sender, amount * WAD);
+        token2.transfer(_from, amount * WAD);
+        token2.transfer(_from, amount * WAD);
+        //sortPivo();
     }
 
 

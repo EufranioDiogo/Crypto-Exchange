@@ -11,6 +11,7 @@ contract Token2 is StandardToken
     uint256 public totalSupply_;
     uint256  public umToken2EquivaleQuantosToken1 = 0;
     uint256  public umToken2EquivaleQuantosToken3 = 0;
+    
 
     constructor() public
     {

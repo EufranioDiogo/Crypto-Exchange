@@ -89,15 +89,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Simpler version of ERC20 interfacesee https://github.com/ethereum/EIPs/issues/179\",\"methods\":{},\"title\":\"ERC20Basic\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol\":\"ERC20Basic\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol\":{\"keccak256\":\"0xbe141ce649dda3a96fe0c379caeb4981c5dae13143b55bc8a10006aba254e518\",\"urls\":[\"bzz-raw://7f28c3561fe5d7f05b1887d058eca3d721668f26c121b1a8856b16663fc7b228\",\"dweb:/ipfs/QmfSg6Yd63U1FnM6v1drCaiM2BDazxQTcmKJ8s8Vr9Uumu\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Simpler version of ERC20 interfacesee https://github.com/ethereum/EIPs/issues/179\",\"methods\":{},\"title\":\"ERC20Basic\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol\":\"ERC20Basic\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol\":{\"keccak256\":\"0xbe141ce649dda3a96fe0c379caeb4981c5dae13143b55bc8a10006aba254e518\",\"urls\":[\"bzz-raw://7f28c3561fe5d7f05b1887d058eca3d721668f26c121b1a8856b16663fc7b228\",\"dweb:/ipfs/QmfSg6Yd63U1FnM6v1drCaiM2BDazxQTcmKJ8s8Vr9Uumu\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "//SPDX-License-Identifier: GPL-3.0\npragma solidity >=0.4.16 <0.9.0;\n\n\n/**\n * @title ERC20Basic\n * @dev Simpler version of ERC20 interface\n * @dev see https://github.com/ethereum/EIPs/issues/179\n */\ninterface  ERC20Basic  {\n  function totalSupply() external view returns (uint256);\n  function balanceOf(address who) external view returns (uint256);\n  function transfer(address to, uint256 value) external returns (bool);\n  event Transfer(address indexed from, address indexed to, uint256 value);\n}\n\n",
-  "sourcePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol",
+  "sourcePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol",
   "ast": {
-    "absolutePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol",
+    "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol",
     "exportedSymbols": {
       "ERC20Basic": [
         170
@@ -484,7 +484,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol",
+      "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol",
       "exportedSymbols": {
         "ERC20Basic": [
           170
@@ -914,7 +914,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-04T17:29:21.978Z",
+  "updatedAt": "2021-07-06T23:35:22.357Z",
   "devdoc": {
     "details": "Simpler version of ERC20 interfacesee https://github.com/ethereum/EIPs/issues/179",
     "methods": {},

@@ -197,15 +197,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"see https://github.com/ethereum/EIPs/issues/20\",\"methods\":{},\"title\":\"ERC20 interface\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20.sol\":\"ERC20\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20.sol\":{\"keccak256\":\"0x6d4c28450910a60af291e8bbf0ae6b6f05e33d87792ba844072ea6b5e3510335\",\"urls\":[\"bzz-raw://7ff12a08a52667a055a35efef4307efc3cdf419083b65a31c480fbd84c4535d1\",\"dweb:/ipfs/QmNnGWnWQ6C6zQzmDaXfVXZuXYa2tzRf3ZqPkoYG99kMEC\"]},\"/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol\":{\"keccak256\":\"0xbe141ce649dda3a96fe0c379caeb4981c5dae13143b55bc8a10006aba254e518\",\"urls\":[\"bzz-raw://7f28c3561fe5d7f05b1887d058eca3d721668f26c121b1a8856b16663fc7b228\",\"dweb:/ipfs/QmfSg6Yd63U1FnM6v1drCaiM2BDazxQTcmKJ8s8Vr9Uumu\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"see https://github.com/ethereum/EIPs/issues/20\",\"methods\":{},\"title\":\"ERC20 interface\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20.sol\":\"ERC20\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20.sol\":{\"keccak256\":\"0x6d4c28450910a60af291e8bbf0ae6b6f05e33d87792ba844072ea6b5e3510335\",\"urls\":[\"bzz-raw://7ff12a08a52667a055a35efef4307efc3cdf419083b65a31c480fbd84c4535d1\",\"dweb:/ipfs/QmNnGWnWQ6C6zQzmDaXfVXZuXYa2tzRf3ZqPkoYG99kMEC\"]},\"/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol\":{\"keccak256\":\"0xbe141ce649dda3a96fe0c379caeb4981c5dae13143b55bc8a10006aba254e518\",\"urls\":[\"bzz-raw://7f28c3561fe5d7f05b1887d058eca3d721668f26c121b1a8856b16663fc7b228\",\"dweb:/ipfs/QmfSg6Yd63U1FnM6v1drCaiM2BDazxQTcmKJ8s8Vr9Uumu\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "//SPDX-License-Identifier: GPL-3.0\npragma solidity >=0.4.16 <0.9.0;\n\n\nimport \"./ERC20Basic.sol\";\n\n\n/**\n * @title ERC20 interface\n * @dev see https://github.com/ethereum/EIPs/issues/20\n */\ncontract ERC20 is ERC20Basic {\n  function allowance(address owner, address spender) external view returns (uint256);\n  function transferFrom(address from, address to, uint256 value) external returns (bool);\n  function approve(address spender, uint256 value) external returns (bool);\n  event Approval(address indexed owner, address indexed spender, uint256 value);\n}\n\n",
-  "sourcePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20.sol",
+  "sourcePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20.sol",
   "ast": {
-    "absolutePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20.sol",
+    "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20.sol",
     "exportedSymbols": {
       "ERC20": [
         138
@@ -229,7 +229,7 @@
         "src": "35:32:1"
       },
       {
-        "absolutePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol",
+        "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol",
         "file": "./ERC20Basic.sol",
         "id": 98,
         "nodeType": "ImportDirective",
@@ -733,7 +733,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20.sol",
+      "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20.sol",
       "exportedSymbols": {
         "ERC20": [
           138
@@ -760,7 +760,7 @@
       {
         "attributes": {
           "SourceUnit": 171,
-          "absolutePath": "/home/ed/Downloads/EXCHANGE/ucan_exchange-master/src/contracts/ERC20Basic.sol",
+          "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/ERC20Basic.sol",
           "file": "./ERC20Basic.sol",
           "scope": 139,
           "symbolAliases": [
@@ -1300,7 +1300,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-04T17:29:21.977Z",
+  "updatedAt": "2021-07-06T23:35:22.355Z",
   "devdoc": {
     "details": "see https://github.com/ethereum/EIPs/issues/20",
     "methods": {},

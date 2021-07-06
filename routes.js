@@ -51,7 +51,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
         dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
             const privateKey = req.body.privateKey;
 
-            console.log(idEstudante)
             if (privateKey != data.privateKey) {
                 res.status(404).json({
                     "status": "error, not authorized",
@@ -81,11 +80,10 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
                 const detailsOfTransfer = {
                     from: idConta,
-                    to: exchangeAddress,
-                    value: amount
+                    to: exchangeAddress
                 }
 
-                exchangeContract.methods.swap(idConta, exchangeAddress, amount)
+                exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto)
                     .send(detailsOfTransfer)
                     .then(async (result) => {
                         console.log(result);

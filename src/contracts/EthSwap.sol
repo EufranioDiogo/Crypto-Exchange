@@ -43,6 +43,7 @@ contract EthSwap
         ucanu = _ucanu;
         ucane = _ucane;
         owner = msg.sender;
+        sortPivo();
     }
 
     /*
@@ -50,13 +51,13 @@ contract EthSwap
     */
     function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
         if (keccak256(bytes(orig)) == keccak256("UCANA")) {
-            ucan.transferFrom(_from, _to, amount * WAD);
-
-            if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                ucanu.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken2() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
-            }
+            ucana.transferFrom(_from, _to, amount * WAD);
+//
+            //if (keccak256(bytes(dest)) == keccak256("UCANU")) {
+            //    ucanu.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken2() * amount);
+            //} else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
+            //    ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
+            //}
         }
 
         //amount = amount;

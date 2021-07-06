@@ -2,7 +2,7 @@ pragma solidity >=0.4.16 <0.9.0;
 
 import "./BasicToken.sol";
 import "./ERC20.sol";
-
+import "./SafeMath.sol";
 
 /**
  * @title Standard ERC20 token
@@ -12,7 +12,6 @@ import "./ERC20.sol";
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
-
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -24,12 +23,10 @@ contract StandardToken is ERC20, BasicToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
-    require(_value <= balances[_from]);
-    require(_value <= allowed[_from][msg.sender]);
 
-    balances[_from] = balances[_from].sub(_value);
-    balances[_to] = balances[_to].add(_value);
-    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+    balances[_from] -= _value;
+    balances[_to] += _value;
+    //allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
     return true;
   }

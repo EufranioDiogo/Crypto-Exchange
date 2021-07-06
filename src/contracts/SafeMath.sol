@@ -28,6 +28,10 @@ library SafeMath {
     return c;
   }
 
+  function divEly(uint256 a, uint256 b) internal pure returns (uint256) {
+    return a * (10 ** 18) / b;
+  }
+
   /**
   * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */

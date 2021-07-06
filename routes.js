@@ -85,22 +85,22 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     value: amount
                 }
 
-                exchangeContract.methods.swap(idConta, amount)
-                .send(detailsOfTransfer)
-                .then(async (result) => {
+                exchangeContract.methods.swap(idConta, exchangeAddress, amount)
+                    .send(detailsOfTransfer)
+                    .then(async (result) => {
                         console.log(result);
 
                         res.status(200).json({
                             "message": result
                         })
                     })
-                .catch(async function (err) {
-                    console.log('err...\n' + err);
+                    .catch(async function (err) {
+                        console.log('err...\n' + err);
 
-                    res.status(200).json({
-                        "message": err
+                        res.status(200).json({
+                            "message": err
+                        })
                     })
-                })
 
                 /*    
                 
@@ -130,26 +130,20 @@ function routes(app, dbUsers, lms, accounts, web3) {
         dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
             const studentPrivateKey = data.privateKey;
 
-            if (privateKey != studentPrivateKey) {
-                res.status(400).json({
-                    status: 400,
-                    message: 'Error in your authentication'
-                })
-            } else {
-                const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
-                const balanceToken2 = await exchangeContract.methods.getBalanceOfToken2().call({from: idConta});
-                const balanceToken3 = await exchangeContract.methods.getBalanceOfToken3().call({from: idConta});
+            const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({ from: idConta });
+            const balanceToken2 = await exchangeContract.methods.getBalanceOfToken2().call({ from: idConta });
+            const balanceToken3 = await exchangeContract.methods.getBalanceOfToken3().call({ from: idConta });
 
-                res.status(200).json({
-                    status: 200,
-                    message: 'Balances of your account',
-                    balances: {
-                        ucana: balanceToken1,
-                        ucanu: balanceToken2,
-                        ucane: balanceToken3 
-                    }
-                });
-            }
+            res.status(200).json({
+                status: 200,
+                message: 'Balances of your account',
+                balances: {
+                    ucana: balanceToken1,
+                    ucanu: balanceToken2,
+                    ucane: balanceToken3
+                }
+            });
+
         }).catch((error) => {
             res.status(500).json({
                 status: 500,
@@ -207,25 +201,69 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
 
 
-    app.get('/getData', (req, res) => {
-        const email = req.body.email
+    app.get('/exchange', (req, res) => {
+        const idEstudante = req.body.idEstudante;
 
-        if (email) {
-            dbUser.findOne({ email }).then(data => {
-                if (data) {
-                    res.status(200).json({
-                        "status": 200,
-                        "user": data
-                    })
-                } else {
-                    res.status(400).json({ "status": "Failed", "reason": "User does not exist" })
+        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+            const relationsToken1 = {
+                relations: await exchangeContract.methods.getRelationOfToken1().call(),
+            }
+            let tokenAtoU = relationsToken1.relations['0'];
+            let tokenAtoE = relationsToken1.relations['1'];
+
+            const relationsToken2 = {
+                relations: await exchangeContract.methods.getRelationOfToken2().call(),
+            }
+
+            let tokenUtoA = relationsToken2.relations['0'];
+            let tokenUtoE = relationsToken2.relations['1'];
+
+
+            const relationsToken3 = {
+                relations: await exchangeContract.methods.getRelationOfToken3().call(),
+            }
+
+            
+            let tokenEtoA = relationsToken3.relations['0'];
+            let tokenEtoU = relationsToken3.relations['1'];
+
+
+            const pivo = await exchangeContract.methods.getIdPivo().call();
+            let pivoName = '';
+
+            if (pivo == '1') {
+                pivoName = 'UCANA';
+            } else if (pivo == '2') {
+                pivoName = 'UCANU';
+            } else {
+                pivoName = 'UCANE';
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'Balances of Exchange',
+                pivoName: pivoName,
+                balances: {
+                    ucana: {
+                        ucane: tokenAtoE,
+                        ucanu: tokenAtoU
+                    },
+                    ucanu: {
+                        ucana: tokenUtoA,
+                        ucane: tokenUtoE
+                    },
+                    ucane: {
+                        ucana: tokenEtoA,
+                        ucanu: tokenEtoU
+                    } 
                 }
-            }).catch(err => {
-                res.status(400).json({ "status": "Failed", "error": err })
             });
-        } else {
-            res.status(400).json({ "status": "Failed", "reason": "wrong input" })
-        }
+        }).catch((error) => {
+            res.status(500).json({
+                status: 500,
+                message: ''
+            })
+        })
     })
 }
 

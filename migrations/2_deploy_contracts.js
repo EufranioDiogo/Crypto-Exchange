@@ -34,7 +34,12 @@ module.exports = async function(deployer) {
         '0x6Bfe867d3BaEFf60122441eBd38f6331Ba1423E4',
         '0xBE514F502E3Bd956e24c5742b02809c7Dab8Dc40',
         '0x32f174056c89dAB87bb39562b599A3b7264eF37b',
-        '0x2b976aAaF63DAb696064d654b6850077c5C74a3c'
+        '0x2b976aAaF63DAb696064d654b6850077c5C74a3c',
+        '0x327E301f1de40f107Ab7fA199A337ea5bC6eB351',
+        '0xD53488049fafC8CE778b10e84bc836dBbf96c2A7',
+        '0x7181C2d42F6b852B4fE6424f6a94Cc3e849270F3',
+        '0x65298C3B11904ADd549c006FE80a93222205E198',
+        '0x9641d7bEbF6916fD8A0316E3D9d0121d0802c742'
       ];
 
       // Meio milhão, valor máximo a ser distribuido 5000 por conta

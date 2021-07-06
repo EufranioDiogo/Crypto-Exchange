@@ -53,19 +53,31 @@ contract EthSwap
         if (keccak256(bytes(orig)) == keccak256("UCANA")) {
             ucana.transferFrom(_from, _to, amount * WAD);
 //
-            //if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-            //    ucanu.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken2() * amount);
-            //} else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-            //    ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
-            //}
+            if (keccak256(bytes(dest)) == keccak256("UCANU")) {
+                ucanu.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken2() * amount);
+            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
+                ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
+            }
         }
+        else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
+            ucanu.transferFrom(_from, _to, amount * WAD);
 
-        //amount = amount;
+            if (keccak256(bytes(dest)) == keccak256("UCANA")) {
+                ucana.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken1() * amount);
+            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
+                ucane.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken3() * amount);
+            }
+        }
+        else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
+            ucane.transferFrom(_from, _to, amount * WAD);
 
-        //ucana.transferFrom(msg.sender, _to, msg.value);
-        //ucanu.transfer(msg.sender, amount * WAD);
-        //ucanu.transfer(_to, amount * WAD);
-        //sortPivo();
+            if (keccak256(bytes(dest)) == keccak256("UCANA")) {
+                ucana.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken1() * amount);
+            } else if (keccak256(bytes(dest)) == keccak256("UCANU")) {
+                ucanu.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken2() * amount);
+            }
+        }
+        sortPivo();
     }
 
 

@@ -3065,12 +3065,12 @@
         }
       },
       "links": {},
-      "address": "0xB481B88943EdDa90aF3e87d8A58435b1680a5570",
-      "transactionHash": "0xb5ee5cc2b9bc01c80b5471a03457490b0484b4349b71682d0ba025ad26eb3c18"
+      "address": "0x4B60C6929CC3a8B20927566db7F91C8b42E228F0",
+      "transactionHash": "0x2a9432512f587f286bc1230c7a750e180a162ecc2d3fae2042cb21e392841beb"
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-04T20:31:33.302Z",
+  "updatedAt": "2021-07-06T03:52:18.890Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {

@@ -51,6 +51,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
             const privateKey = req.body.privateKey;
 
+            console.log(idEstudante)
             if (privateKey != data.privateKey) {
                 res.status(404).json({
                     "status": "error, not authorized",
@@ -59,6 +60,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
             } else {
                 const origCrypto = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
                 const destCrypto = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
+
 
                 if (origCrypto != 'UCANU' && origCrypto != 'UCANA' && origCrypto != 'UCANE') {
                     res.status(400).json({
@@ -74,42 +76,48 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     })
                 }
 
+                const idConta = req.body.idConta;
+                const amount = req.body.amount; // Passado uma string, exempl: 100 significando 100 unidades da moeda X
+
+                const detailsOfTransfer = {
+                    from: idConta,
+                    to: exchangeAddress,
+                    value: amount
+                }
+
+                exchangeContract.methods.swap(idConta, amount)
+                .send(detailsOfTransfer)
+                .then(async (result) => {
+                        console.log(result);
+
+                        res.status(200).json({
+                            "message": result
+                        })
+                    })
+                .catch(async function (err) {
+                    console.log('err...\n' + err);
+
+                    res.status(200).json({
+                        "message": err
+                    })
+                })
+
+                /*    
+                
+
                 if (origCrypto == destCrypto) {
                     res.status(400).json({
                         "error": 400,
                         "message": "You can't swap the same cryptos"
                     })
                 } else {
-                    const idConta = req.body.idConta;
-                    const amount = req.body.amount; // Passado uma string, exempl: 100 significando 100 unidades da moeda X
-    
-                    const detailsOfTransfer = {
-                        from: idConta,
-                        to: exchangeAddress,
-                        value: amount
-                    }
-
-                    exchangeContract.methods.swap(detailsOfTransfer.to, detailsOfTransfer.from, amount).send(detailsOfTransfer)
-                    .then(async (result) => {
-                            console.log(result);
-    
-                            res.status(200).json({
-                                "message": result
-                            })
-                        })
-                    .catch(async function (err) {
-                        console.log('err...\n' + err);
-    
-                        res.status(200).json({
-                            "message": err
-                        })
-                    })
-                }
+                    
+                }*/
             }
         }).catch((error) => {
             res.status(404).json({
-                "status": "error",
-                "message": "Error user not registred"
+                "status": 400,
+                "message": error
             })
         })
     })
@@ -123,16 +131,16 @@ function routes(app, dbUsers, lms, accounts, web3) {
             const studentPrivateKey = data.privateKey;
 
             if (privateKey != studentPrivateKey) {
-                res.status(400).response({
+                res.status(400).json({
                     status: 400,
                     message: 'Error in your authentication'
                 })
             } else {
                 const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
-                const balanceToken2 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
-                const balanceToken3 = await exchangeContract.methods.getBalanceOfToken1().call({from: idConta});
+                const balanceToken2 = await exchangeContract.methods.getBalanceOfToken2().call({from: idConta});
+                const balanceToken3 = await exchangeContract.methods.getBalanceOfToken3().call({from: idConta});
 
-                res.status(200).response({
+                res.status(200).json({
                     status: 200,
                     message: 'Balances of your account',
                     balances: {
@@ -143,7 +151,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 });
             }
         }).catch((error) => {
-            res.status(500).response({
+            res.status(500).json({
                 status: 500,
                 message: ''
             })

@@ -48,13 +48,13 @@ contract EthSwap
     /*
     
     */
-    function swap(address  _to, address _from, uint256 amount) public payable {
+    function swap(address _from, uint256 amount) public payable {
         //amount = amount;
 
         //token1.transferFrom(msg.sender, _to, msg.value);
         token2.transfer(msg.sender, amount * WAD);
-        token2.transfer(_from, amount * WAD);
-        token2.transfer(_from, amount * WAD);
+        token2.transfer(msg.sender, amount * WAD);
+        token2.transfer(msg.sender, amount * WAD);
         //sortPivo();
     }
 

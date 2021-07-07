@@ -159,19 +159,17 @@ function routes(app, dbUsers, lms, accounts, web3) {
         const sobrenome = req.body.sobrenome;
         const idConta = req.body.idConta;
         const privateKey = req.body.privateKey;
-        const email = req.body.email;
 
         const user = {
             idEstudante,
             nome,
             sobrenome,
             idConta,
-            privateKey,
-            email
+            privateKey
         }
 
-        if (idEstudante && nome && sobrenome && idConta && privateKey && email) {
-            dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey, email })
+        if (idEstudante && nome && sobrenome && idConta && privateKey) {
+            dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey})
                 .then(data => {
                     if (data != null) {
                         res.status(400).json({

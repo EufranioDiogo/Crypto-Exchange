@@ -137,7 +137,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 89,
-        "sourceUnit": 1282,
+        "sourceUnit": 976,
         "src": "97:24:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -184,10 +184,10 @@
               "id": 6,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1281,
+              "referencedDeclaration": 975,
               "src": "258:8:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$1281",
+                "typeIdentifier": "t_contract$_SafeMath_$975",
                 "typeString": "library SafeMath"
               }
             },
@@ -464,10 +464,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1792,
-                        1793
+                        1536,
+                        1537
                       ],
-                      "referencedDeclaration": 1792,
+                      "referencedDeclaration": 1536,
                       "src": "717:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -546,7 +546,7 @@
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 1789,
+                              "referencedDeclaration": 1533,
                               "src": "776:3:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_magic_message",
@@ -596,10 +596,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1792,
-                        1793
+                        1536,
+                        1537
                       ],
-                      "referencedDeclaration": 1792,
+                      "referencedDeclaration": 1536,
                       "src": "749:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -656,7 +656,7 @@
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1789,
+                          "referencedDeclaration": 1533,
                           "src": "867:3:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
@@ -738,7 +738,7 @@
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 1789,
+                              "referencedDeclaration": 1533,
                               "src": "890:3:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_magic_message",
@@ -777,7 +777,7 @@
                         "lValueRequested": false,
                         "memberName": "sub",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 1256,
+                        "referencedDeclaration": 950,
                         "src": "881:24:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -929,7 +929,7 @@
                         "lValueRequested": false,
                         "memberName": "add",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 1280,
+                        "referencedDeclaration": 974,
                         "src": "935:17:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1276,7 +1276,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 1282,
+          "SourceUnit": 976,
           "absolutePath": "/home/ed/Downloads/EXCHANGE/ExechAux/src/contracts/SafeMath.sol",
           "file": "./SafeMath.sol",
           "scope": 89,
@@ -1332,7 +1332,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "SafeMath",
-                  "referencedDeclaration": 1281,
+                  "referencedDeclaration": 975,
                   "type": "library SafeMath"
                 },
                 "id": 6,
@@ -1657,10 +1657,10 @@
                                 }
                               ],
                               "overloadedDeclarations": [
-                                1792,
-                                1793
+                                1536,
+                                1537
                               ],
-                              "referencedDeclaration": 1792,
+                              "referencedDeclaration": 1536,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -1794,10 +1794,10 @@
                                 }
                               ],
                               "overloadedDeclarations": [
-                                1792,
-                                1793
+                                1536,
+                                1537
                               ],
-                              "referencedDeclaration": 1792,
+                              "referencedDeclaration": 1536,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -1876,7 +1876,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 1789,
+                                          "referencedDeclaration": 1533,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -1964,7 +1964,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 1789,
+                                      "referencedDeclaration": 1533,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -2010,7 +2010,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "sub",
-                                  "referencedDeclaration": 1256,
+                                  "referencedDeclaration": 950,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -2056,7 +2056,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 1789,
+                                              "referencedDeclaration": 1533,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -2192,7 +2192,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "add",
-                                  "referencedDeclaration": 1280,
+                                  "referencedDeclaration": 974,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -2474,7 +2474,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-08T02:54:22.048Z",
+  "updatedAt": "2021-07-08T12:03:10.052Z",
   "devdoc": {
     "details": "Basic version of StandardToken, with no allowances.",
     "methods": {

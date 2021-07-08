@@ -13,9 +13,9 @@ contract Token is StandardToken
     uint256  public umToken1EquivaleQuantosToken3 = 0;
 
 
-    constructor() public {
-        totalSupply_ = INITIAL_SUPPLY;
-        balances[msg.sender] = INITIAL_SUPPLY;
+    constructor(uint totalSupply) public {
+        totalSupply_ = totalSupply * (10 ** decimals);
+        balances[msg.sender] = totalSupply * (10 ** decimals);
     }
 
     function getTokenSymbol() public view returns(string memory) {

@@ -177,7 +177,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         }
 
         if (idEstudante && nome && sobrenome && idConta && privateKey) {
-            dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey})
+            dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey })
                 .then(data => {
                     if (data != null) {
                         res.status(400).json({
@@ -227,7 +227,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 relations: await exchangeContract.methods.getRelationOfToken3().call(),
             }
 
-            
+
             let tokenEtoA = relationsToken3.relations['0'];
             let tokenEtoU = relationsToken3.relations['1'];
 
@@ -251,7 +251,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     ucane: {
                         ucana: tokenEtoA,
                         ucanu: tokenEtoU
-                    } 
+                    }
                 }
             });
             return;
@@ -263,6 +263,9 @@ function routes(app, dbUsers, lms, accounts, web3) {
             return;
         })
     })
+
+
+    // magic function 
 
     app.get('/stockExchange', (req, res) => {
         const idEstudante = req.body.idEstudante;
@@ -290,6 +293,35 @@ function routes(app, dbUsers, lms, accounts, web3) {
             return;
         })
     })
+
+
+    app.get('/stockExchange', (req, res) => {
+        const idEstudante = req.body.idEstudante;
+
+        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+            const totalUCANA = await exchangeContract.methods.getTotalValorNaBolsaUCANA().call();
+            const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
+            const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
+
+            res.status(200).json({
+                status: 200,
+                message: 'Balances of Exchange',
+                balances: {
+                    ucana: totalUCANA,
+                    ucanu: totalUCANU,
+                    ucane: totalUCANE
+                }
+            });
+            return;
+        }).catch((error) => {
+            res.status(500).json({
+                status: 500,
+                message: error
+            })
+            return;
+        })
+    })
+
 }
 
 module.exports = routes

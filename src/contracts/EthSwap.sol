@@ -20,6 +20,7 @@ contract EthSwap
     mapping(address => uint256) public balanceOfToken1;
     string public pivoName = "";
 
+
     constructor(Token _token, Token2 _ucanu, Token3 _ucane) public
     {
         ucana = _token;
@@ -81,7 +82,17 @@ contract EthSwap
             uint256 ucaneToUcanu = ucane.getUmToken3EquivaleQuantosToken2() * (this.getTotalValorNaBolsaUCANE() / WAD);
             uint256 totalUcanu = this.getTotalValorNaBolsaUCANU();
 
-            if (ucanaToUcanu > totalUcanu) {
+            if (ucanaToUcanu > totalUcanu) { /*    
+                
+
+                if (origCrypto == destCrypto) {
+                    res.status(400).json({
+                        "error": 400,
+                        "message": "You can't swap the same cryptos"
+                    })
+                } else {
+                    
+                }*/
                 pivoName = "UCANA";
                 setNewPivo(pivoName);
             } else if (ucaneToUcanu > totalUcanu) {
@@ -104,6 +115,9 @@ contract EthSwap
     }
 
 
+
+
+ 
     function getIdPivo() public returns (string memory) {
         return pivoName;
     }

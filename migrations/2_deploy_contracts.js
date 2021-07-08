@@ -1,3 +1,6 @@
+const {TOTAL_SUPPLY_UCANA, TOTAL_SUPPLY_UCANU, TOTAL_SUPPLY_UCANE, AMOUNT_TO_UCANA_TO_EXCHANGE, AMOUNT_TO_UCANU_TO_EXCHANGE, AMOUNT_TO_UCANE_TO_EXCHANGE, AMOUNT_UCANA_TO_STUDENTS, AMOUNT_UCANU_TO_STUDENTS, AMOUNT_UCANE_TO_STUDENTS} = require('./config_file');
+
+
 const Token = artifacts.require("Token");
 const Token2 = artifacts.require("Token2");
 const Token3 = artifacts.require("Token3");
@@ -5,13 +8,13 @@ const EthSwap = artifacts.require("EthSwap");
 
 module.exports = async function(deployer) {
     // Deploy Token
-    await deployer.deploy(Token);
+    await deployer.deploy(Token, TOTAL_SUPPLY_UCANA);
     const token = await Token.deployed()
 
-    await deployer.deploy(Token2);
+    await deployer.deploy(Token2, TOTAL_SUPPLY_UCANU);
     const token2 = await Token2.deployed()
 
-    await deployer.deploy(Token3);
+    await deployer.deploy(Token3, TOTAL_SUPPLY_UCANE);
     const token3 = await Token3.deployed()
 
     // Deploy EthSwap
@@ -19,9 +22,9 @@ module.exports = async function(deployer) {
     const ethSwap = await EthSwap.deployed()
 
     // Transfer all tokens to EthSwap (1 million)
-    await token.transfer(ethSwap.address,  '51' + '000000000000000000'); // UCANA
-    await token2.transfer(ethSwap.address, '34' + '000000000000000000'); // UCANU
-    await token3.transfer(ethSwap.address, '50' + '000000000000000000'); // UCANE
+    await token.transfer(ethSwap.address,  AMOUNT_TO_UCANA_TO_EXCHANGE); // UCANA
+    await token2.transfer(ethSwap.address, AMOUNT_TO_UCANU_TO_EXCHANGE); // UCANU
+    await token3.transfer(ethSwap.address, AMOUNT_TO_UCANE_TO_EXCHANGE); // UCANE
 
     await ethSwap.sortInitialPivo();
   
@@ -45,14 +48,11 @@ module.exports = async function(deployer) {
       ];
 
       // Meio milhão, valor máximo a ser distribuido 5000 por conta
-      const quantTokens1ToAccounts = '20000' + '000000000000000000';
-      const quantTokens2ToAccounts = '3' + '000000000000000000';
-      const quantTokens3ToAccounts = '10000' + '000000000000000000';
 
       for (let accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
         console.log("Account " + accountIndex + "º " + accounts[accountIndex])
-        await token.transfer(accounts[accountIndex], quantTokens1ToAccounts)
-        await token2.transfer(accounts[accountIndex], quantTokens2ToAccounts)
-        await token3.transfer(accounts[accountIndex], quantTokens3ToAccounts)
+        await token.transfer(accounts[accountIndex], AMOUNT_UCANA_TO_STUDENTS)
+        await token2.transfer(accounts[accountIndex], AMOUNT_UCANU_TO_STUDENTS)
+        await token3.transfer(accounts[accountIndex], AMOUNT_UCANE_TO_STUDENTS)
       }
 };

@@ -19,9 +19,9 @@ module.exports = async function(deployer) {
     const ethSwap = await EthSwap.deployed()
 
     // Transfer all tokens to EthSwap (1 million)
-    await token.transfer(ethSwap.address,  '1000000000000000000000000');
-    await token2.transfer(ethSwap.address, '1000000000000000000000000');
-    await token3.transfer(ethSwap.address, '1000000000000000000000000');
+    await token.transfer(ethSwap.address,  '30' + '000000000000000000'); // UCANA
+    await token2.transfer(ethSwap.address, '10' + '000000000000000000'); // UCANU
+    await token3.transfer(ethSwap.address, '50' + '000000000000000000'); // UCANE
 
     console.log('Quant tokens 1 exchange')
     console.log((await token.balanceOf(ethSwap.address)).toString());
@@ -43,9 +43,9 @@ module.exports = async function(deployer) {
       ];
 
       // Meio milhão, valor máximo a ser distribuido 5000 por conta
-      const quantTokens1ToAccounts = '2000' + '000000000000000000';
-      const quantTokens2ToAccounts = '3000' + '000000000000000000';
-      const quantTokens3ToAccounts = '1000' + '000000000000000000';
+      const quantTokens1ToAccounts = '20000' + '000000000000000000';
+      const quantTokens2ToAccounts = '3' + '000000000000000000';
+      const quantTokens3ToAccounts = '10000' + '000000000000000000';
 
       for (let accountIndex = 0; accountIndex < accounts.length; accountIndex++) {
         console.log("Account " + accountIndex + "º " + accounts[accountIndex])

@@ -14,28 +14,11 @@ contract EthSwap
     Token public ucana;
     Token2 public ucanu;
     Token3 public ucane;
-    uint public rate = 100;
     uint256 constant WAD = 10**18;
-    uint256 idPivo = 0;
     uint rangeLimit = 10;
     address public owner;
     mapping(address => uint256) public balanceOfToken1;
-    string public entrou;
-
-
-    event TokensPurchased(
-        address account,
-        address ucana,
-        uint amount,
-        uint rate
-    );
-
-    event TokensSold(
-        address account,
-        address ucana,
-        uint amount,
-        uint rate
-    );
+    string public pivoName = "";
 
     constructor(Token _token, Token2 _ucanu, Token3 _ucane) public
     {
@@ -43,7 +26,8 @@ contract EthSwap
         ucanu = _ucanu;
         ucane = _ucane;
         owner = msg.sender;
-        sortPivo();
+        sortInitialPivo();
+        //sortPivo();
     }
 
     /*
@@ -51,6 +35,8 @@ contract EthSwap
     */
     function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
         if (keccak256(bytes(orig)) == keccak256("UCANA")) {
+            require(ucana.balanceOf(_from) >= amount * WAD);
+
             ucana.transferFrom(_from, _to, amount * WAD);
 //
             if (keccak256(bytes(dest)) == keccak256("UCANU")) {
@@ -58,87 +44,74 @@ contract EthSwap
             } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
                 ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
             }
-        }
-        else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
-            ucanu.transferFrom(_from, _to, amount * WAD);
+        } else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
+            require(ucanu.balanceOf(_from) >= amount * WAD);
 
+            ucanu.transferFrom(_from, _to, amount * WAD);
+//
             if (keccak256(bytes(dest)) == keccak256("UCANA")) {
                 ucana.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken1() * amount);
             } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
                 ucane.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken3() * amount);
             }
-        }
-        else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
+        } else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
+            require(ucane.balanceOf(_from) >= amount * WAD);
             ucane.transferFrom(_from, _to, amount * WAD);
-
-            if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                ucana.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken1() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANU")) {
+//
+            if (keccak256(bytes(dest)) == keccak256("UCANU")) {
                 ucanu.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken2() * amount);
+            } else if (keccak256(bytes(dest)) == keccak256("UCANA")) {
+                ucana.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken1() * amount);
             }
         }
-        sortPivo();
-    }
 
 
-    // function to give the right price value
+        if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
+            uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (ucanu.balanceOfToken(address(this)) / WAD);
+            uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (ucana.balanceOfToken(address(this)) / WAD);
+            uint256 totalUcana = ucana.balanceOfToken(address(this));
 
-    function sortPivo() private {
-        uint256 sorted = random(rangeLimit) + 1;
+            if (ucaneToUcana > totalUcana) {
+                pivoName = "UCANE";
+                setNewPivo(pivoName);
+            } else if (ucanuToUcana > totalUcana) {
+                pivoName = "UCANU";
+                setNewPivo(pivoName);
+            }
+        } else if (keccak256(bytes(pivoName)) == keccak256("UCANU")) {
+            uint256 ucanaToUcanu = ucana.getUmToken1EquivaleQuantosToken2() * (ucana.balanceOfToken(address(this)) / WAD);
+            uint256 ucaneToUcanu = ucane.getUmToken3EquivaleQuantosToken2() * (ucane.balanceOfToken(address(this)) / WAD);
+            uint256 totalUcanu = ucanu.balanceOfToken(address(this));
 
-        uint256 equivalencia1 = random(rangeLimit) + 1;
-        uint256 equivalencia2 = equivalencia1 + 2;
-        uint256 const = 1;
+            if (ucanaToUcanu > totalUcanu) {
+                pivoName = "UCANA";
+                setNewPivo(pivoName);
+            } else if (ucaneToUcanu > totalUcanu) {
+                pivoName = "UCANE";
+                setNewPivo(pivoName);
+            }
+        } else if (keccak256(bytes(pivoName)) == keccak256("UCANE")) {
+            uint256 ucanaToUcane = ucana.getUmToken1EquivaleQuantosToken3() * (ucana.balanceOfToken(address(this)) / WAD);
+            uint256 ucanuToUcane = ucanu.getUmToken2EquivaleQuantosToken3() * (ucanu.balanceOfToken(address(this)) / WAD);
+            uint256 totalUcane = ucane.balanceOfToken(address(this));
 
-        if (sorted <= 2) {
-            // Token1 is the pivo UCANA
-
-            ucana.setUmToken1EquivaleQuantosToken2(equivalencia1 * WAD);
-            ucana.setUmToken1EquivaleQuantosToken3(equivalencia2 * WAD);
-
-            ucane.setUmToken3EquivaleQuantosToken1(const.divEly(equivalencia2));
-            ucanu.setUmToken2EquivaleQuantosToken1(const.divEly(equivalencia1));
-
-            ucanu.setUmToken2EquivaleQuantosToken3(equivalencia2.divEly(equivalencia1));
-            ucane.setUmToken3EquivaleQuantosToken2(equivalencia1.divEly(equivalencia2));
-            idPivo = 1;
-        } else if (sorted <= 5) {
-            // Token2 is the pivo UCANU
-
-            ucanu.setUmToken2EquivaleQuantosToken1(equivalencia1 * WAD);
-            ucanu.setUmToken2EquivaleQuantosToken3(equivalencia2 * WAD);
-
-            ucana.setUmToken1EquivaleQuantosToken2(const.divEly(equivalencia1));
-            ucane.setUmToken3EquivaleQuantosToken2(const.divEly(equivalencia2));
-
-            ucana.setUmToken1EquivaleQuantosToken3(equivalencia2.divEly(equivalencia1));
-            ucane.setUmToken3EquivaleQuantosToken1(equivalencia1.divEly(equivalencia2));
-            idPivo = 2;
-        } else {
-            // Token3 is the pivo UCANE
-
-            ucane.setUmToken3EquivaleQuantosToken1(equivalencia1 * WAD);
-            ucane.setUmToken3EquivaleQuantosToken2(equivalencia2 * WAD);
-
-            ucana.setUmToken1EquivaleQuantosToken3(const.divEly(equivalencia1));
-            ucanu.setUmToken2EquivaleQuantosToken3(const.divEly(equivalencia2));
-
-            ucana.setUmToken1EquivaleQuantosToken2(equivalencia2.divEly(equivalencia1));
-            ucanu.setUmToken2EquivaleQuantosToken1(equivalencia1.divEly(equivalencia2));
-            idPivo = 3;
+            if (ucanaToUcane > totalUcane) {
+                pivoName = "UCANA";
+                setNewPivo(pivoName);
+            } else if (ucanuToUcane > totalUcane) {
+                pivoName = "UCANU";
+                setNewPivo(pivoName);
+            }
         }
     }
 
-    function getIdPivo() public returns (uint256) {
-        return idPivo;
+
+    function getIdPivo() public returns (string memory) {
+        return pivoName;
     }
 
     function random(uint mod) internal returns (uint) {
         return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.difficulty))) % mod;
-    }
-
-    function helloWorld() public view returns(string memory) {
-        return "Ola mundo"; 
     }
 
     function getBalanceOfToken1() public returns (uint256) {
@@ -153,9 +126,6 @@ contract EthSwap
         return ucane.balanceOfToken(msg.sender);
     }
 
-    function getBalanceOfTotal() public returns (uint256) {
-        return ucane.balanceOfToken(msg.sender);
-    }
 
     function getRelationOfToken1() public returns (uint256, uint256) {
         return (ucana.getUmToken1EquivaleQuantosToken2(), ucana.getUmToken1EquivaleQuantosToken3());
@@ -167,5 +137,72 @@ contract EthSwap
 
     function getRelationOfToken3() public returns (uint256, uint256) {
         return (ucane.getUmToken3EquivaleQuantosToken1(), ucane.getUmToken3EquivaleQuantosToken2());
+    }
+
+    function sortInitialPivo() public {
+        int256 totalUcana = int256(getTotalValorNaBolsaUCANA()); // M1
+        int256 totalUcane = int256(getTotalValorNaBolsaUCANE()); // M2
+        int256 totalUcanu = int256(getTotalValorNaBolsaUCANU()); // M3
+
+        if (totalUcana < totalUcane && totalUcana < totalUcanu) {
+            pivoName = "UCANA";
+        }
+        else if (totalUcane <= totalUcanu) {
+            pivoName = "UCANE";
+        }
+        else {
+            pivoName = "UCANU";
+        }
+        setNewPivo(pivoName);
+    }
+
+
+    function setNewPivo(string memory pivo) public {
+        uint256 const = 1;
+        uint256 equivalencia1 = random(rangeLimit) + 2;
+        uint256 equivalencia2 = equivalencia1 + 2;
+
+        if (keccak256(bytes(pivo)) == keccak256("UCANA")) {
+            ucana.setUmToken1EquivaleQuantosToken2(equivalencia1 * WAD);
+            ucana.setUmToken1EquivaleQuantosToken3(equivalencia2 * WAD);
+
+            ucane.setUmToken3EquivaleQuantosToken1(const.divEly(equivalencia2));
+            ucanu.setUmToken2EquivaleQuantosToken1(const.divEly(equivalencia1));
+
+            ucanu.setUmToken2EquivaleQuantosToken3(equivalencia2.divEly(equivalencia1));
+            ucane.setUmToken3EquivaleQuantosToken2(equivalencia1.divEly(equivalencia2));
+        } else if (keccak256(bytes(pivo)) == keccak256("UCANU")) {
+            ucanu.setUmToken2EquivaleQuantosToken1(equivalencia1 * WAD);
+            ucanu.setUmToken2EquivaleQuantosToken3(equivalencia2 * WAD);
+
+            ucana.setUmToken1EquivaleQuantosToken2(const.divEly(equivalencia1));
+            ucane.setUmToken3EquivaleQuantosToken2(const.divEly(equivalencia2));
+
+            ucana.setUmToken1EquivaleQuantosToken3(equivalencia2.divEly(equivalencia1));
+            ucane.setUmToken3EquivaleQuantosToken1(equivalencia1.divEly(equivalencia2));
+        } else {
+            ucane.setUmToken3EquivaleQuantosToken1(equivalencia1 * WAD);
+            ucane.setUmToken3EquivaleQuantosToken2(equivalencia2 * WAD);
+
+            ucana.setUmToken1EquivaleQuantosToken3(const.divEly(equivalencia1));
+            ucanu.setUmToken2EquivaleQuantosToken3(const.divEly(equivalencia2));
+
+            ucana.setUmToken1EquivaleQuantosToken2(equivalencia2.divEly(equivalencia1));
+            ucanu.setUmToken2EquivaleQuantosToken1(equivalencia1.divEly(equivalencia2));
+        }
+    }
+
+    function getTotalValorNaBolsaUCANA() public returns (uint256)
+    {
+        return  ucana.balanceOf(address(this));
+    }
+
+    function getTotalValorNaBolsaUCANU() public returns (uint256)
+    {
+        return  ucanu.balanceOf(address(this));
+    }
+    function getTotalValorNaBolsaUCANE() public returns (uint256)
+    {
+        return  ucane.balanceOf(address(this));
     }
 }

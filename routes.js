@@ -56,25 +56,28 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     "status": "error, not authorized",
                     "message": "error not valid private key"
                 })
+                return;
             } else {
                 const origCrypto = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
                 const destCrypto = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
 
-
-                if (origCrypto != 'UCANU' && origCrypto != 'UCANA' && origCrypto != 'UCANE') {
+                /*
+                if (origCrypto != 'UCANU' || origCrypto != 'UCANA' || origCrypto != 'UCANE') {
                     res.status(400).json({
                         "status": 400,
                         "message": "Orig Token not defined"
                     })
+                    return;
                 }
 
-                if (destCrypto != 'UCANU' && destCrypto != 'UCANA' && destCrypto != 'UCANE') {
+                if (destCrypto != 'UCANU' || destCrypto != 'UCANA' || destCrypto != 'UCANE') {
                     res.status(400).json({
                         "status": 400,
                         "message": "Dest Token not defined"
                     })
+                    return;
                 }
-
+*/
                 const idConta = req.body.idConta;
                 const amount = req.body.amount; // Passado uma string, exempl: 100 significando 100 unidades da moeda X
 
@@ -91,6 +94,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                         res.status(200).json({
                             "message": result
                         })
+                        return;
                     })
                     .catch(async function (err) {
                         console.log('err...\n' + err);
@@ -98,6 +102,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                         res.status(200).json({
                             "message": err
                         })
+                        return;
                     })
 
                 /*    
@@ -117,6 +122,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 "status": 400,
                 "message": error
             })
+            return;
         })
     })
 
@@ -141,12 +147,14 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     ucane: balanceToken3
                 }
             });
+            return;
 
         }).catch((error) => {
             res.status(500).json({
                 status: 500,
                 message: ''
             })
+            return;
         })
     })
 
@@ -225,15 +233,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
 
             const pivo = await exchangeContract.methods.getIdPivo().call();
-            let pivoName = '';
-
-            if (pivo == '1') {
-                pivoName = 'UCANA';
-            } else if (pivo == '2') {
-                pivoName = 'UCANU';
-            } else {
-                pivoName = 'UCANE';
-            }
+            let pivoName = pivo;
 
             res.status(200).json({
                 status: 200,
@@ -254,31 +254,43 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     } 
                 }
             });
+            return;
         }).catch((error) => {
             res.status(500).json({
                 status: 500,
                 message: ''
             })
+            return;
+        })
+    })
+
+    app.get('/stockExchange', (req, res) => {
+        const idEstudante = req.body.idEstudante;
+
+        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+            const totalUCANA = await exchangeContract.methods.getTotalValorNaBolsaUCANA().call();
+            const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
+            const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
+
+
+            res.status(200).json({
+                status: 200,
+                message: 'Balances of Exchange',
+                balances: {
+                    ucana: totalUCANA,
+                    ucanu: totalUCANU,
+                    ucane: totalUCANE
+                }
+            });
+            return;
+        }).catch((error) => {
+            res.status(500).json({
+                status: 500,
+                message: ''
+            })
+            return;
         })
     })
 }
 
 module.exports = routes
-
-
-/*
-
-exchangeContract.methods.helloWorld().call().then((result) => {
-            console.log(result);
-            res.status(200).json({
-                "message": result
-            })
-        }).catch(function(err){
-            console.log('err...\n'+err);
-            res.status(200).json({
-                "message": err
-            })
-        });;
-
-
-        */

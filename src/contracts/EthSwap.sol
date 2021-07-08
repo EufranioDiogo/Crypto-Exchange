@@ -34,7 +34,7 @@ contract EthSwap
     */
     function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
         if (keccak256(bytes(orig)) == keccak256("UCANA")) {
-            require(ucana.balanceOf(_from) >= amount * WAD);
+            //require(ucana.balanceOf(_from) >= amount * WAD);
 
             ucana.transferFrom(_from, _to, amount * WAD);
 //
@@ -44,7 +44,7 @@ contract EthSwap
                 ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
             }
         } else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
-            require(ucanu.balanceOf(_from) >= amount * WAD);
+            //require(ucanu.balanceOf(_from) >= amount * WAD);
 
             ucanu.transferFrom(_from, _to, amount * WAD);
 //
@@ -54,7 +54,7 @@ contract EthSwap
                 ucane.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken3() * amount);
             }
         } else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
-            require(ucane.balanceOf(_from) >= amount * WAD);
+            //require(ucane.balanceOf(_from) >= amount * WAD);
             ucane.transferFrom(_from, _to, amount * WAD);
 //
             if (keccak256(bytes(dest)) == keccak256("UCANU")) {
@@ -64,7 +64,7 @@ contract EthSwap
             }
         }
 
-
+/*
         if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
             uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANU() / WAD);
             uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANE() / WAD);
@@ -82,17 +82,7 @@ contract EthSwap
             uint256 ucaneToUcanu = ucane.getUmToken3EquivaleQuantosToken2() * (this.getTotalValorNaBolsaUCANE() / WAD);
             uint256 totalUcanu = this.getTotalValorNaBolsaUCANU();
 
-            if (ucanaToUcanu > totalUcanu) { /*    
-                
-
-                if (origCrypto == destCrypto) {
-                    res.status(400).json({
-                        "error": 400,
-                        "message": "You can't swap the same cryptos"
-                    })
-                } else {
-                    
-                }*/
+            if (ucanaToUcanu > totalUcanu) { 
                 pivoName = "UCANA";
                 setNewPivo(pivoName);
             } else if (ucaneToUcanu > totalUcanu) {
@@ -111,13 +101,9 @@ contract EthSwap
                 pivoName = "UCANU";
                 setNewPivo(pivoName);
             }
-        }
+        }*/
     }
 
-
-
-
- 
     function getIdPivo() public returns (string memory) {
         return pivoName;
     }

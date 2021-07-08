@@ -67,7 +67,7 @@ O projecto possui uma caractéristica técnica de segurança no que são todas a
 
 # Rotas disponiveis
 
-**POST** `/register` -> Rota usada para a criação de um usuário na exchange.
+**POST** `http:/IP:PORTA/register` -> Rota usada para a criação de um usuário na exchange.
 
 O body da requisição de ser da seguinte forma:
 
@@ -81,7 +81,7 @@ O body da requisição de ser da seguinte forma:
 }
 ```
 
-**GET** `/balance/:"idEstudante"` -> Rota usada para saber o seu saldo actual nas 3 moedas.
+**GET** `http:/IP:PORTA/balance/:idEstudante` -> Rota usada para saber o seu saldo actual nas 3 moedas.
 
 Elementos passados por parametro: *"idEstudante"*
 Exemplo:
@@ -93,21 +93,21 @@ O body da requisição de ser da seguinte forma:
 ```
 {
     "idConta": "0xSSMKSAmsjnsd2dmsdkdsjds",
-    "privateKey": "dkksdmkdmdskmdkmdkdsm",
+    "privateKey": "dkksdmkdmdskmdkmdkdsm"
 }
 ```
 
-**GET** `/exchange` -> Rota usada para ter informações sobre o preço e relações entre as moedas.
+**GET** `http:/IP:PORTA/exchange` -> Rota usada para ter informações sobre o preço e relações entre as moedas.
 
 O body da requisição de ser da seguinte forma:
 
 ```
 {
-    "idEstudante": "100000",
+    "idEstudante": "100000"
 }
 ```
 
-**POST** `/swap` -> Rota usada para fazer o swap entre as moedas.
+**POST** `http:/IP:PORTA/swap` -> Rota usada para fazer o swap entre as moedas.
 
 O body da requisição de ser da seguinte forma:
 

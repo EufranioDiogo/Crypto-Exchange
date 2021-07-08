@@ -26,8 +26,6 @@ contract EthSwap
         ucanu = _ucanu;
         ucane = _ucane;
         owner = msg.sender;
-        sortInitialPivo();
-        //sortPivo();
     }
 
     /*
@@ -67,9 +65,9 @@ contract EthSwap
 
 
         if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
-            uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (ucanu.balanceOfToken(address(this)) / WAD);
-            uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (ucana.balanceOfToken(address(this)) / WAD);
-            uint256 totalUcana = ucana.balanceOfToken(address(this));
+            uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANU() / WAD);
+            uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANE() / WAD);
+            uint256 totalUcana = this.getTotalValorNaBolsaUCANA();
 
             if (ucaneToUcana > totalUcana) {
                 pivoName = "UCANE";
@@ -79,9 +77,9 @@ contract EthSwap
                 setNewPivo(pivoName);
             }
         } else if (keccak256(bytes(pivoName)) == keccak256("UCANU")) {
-            uint256 ucanaToUcanu = ucana.getUmToken1EquivaleQuantosToken2() * (ucana.balanceOfToken(address(this)) / WAD);
-            uint256 ucaneToUcanu = ucane.getUmToken3EquivaleQuantosToken2() * (ucane.balanceOfToken(address(this)) / WAD);
-            uint256 totalUcanu = ucanu.balanceOfToken(address(this));
+            uint256 ucanaToUcanu = ucana.getUmToken1EquivaleQuantosToken2() * (this.getTotalValorNaBolsaUCANA() / WAD);
+            uint256 ucaneToUcanu = ucane.getUmToken3EquivaleQuantosToken2() * (this.getTotalValorNaBolsaUCANE() / WAD);
+            uint256 totalUcanu = this.getTotalValorNaBolsaUCANU();
 
             if (ucanaToUcanu > totalUcanu) {
                 pivoName = "UCANA";
@@ -91,9 +89,9 @@ contract EthSwap
                 setNewPivo(pivoName);
             }
         } else if (keccak256(bytes(pivoName)) == keccak256("UCANE")) {
-            uint256 ucanaToUcane = ucana.getUmToken1EquivaleQuantosToken3() * (ucana.balanceOfToken(address(this)) / WAD);
-            uint256 ucanuToUcane = ucanu.getUmToken2EquivaleQuantosToken3() * (ucanu.balanceOfToken(address(this)) / WAD);
-            uint256 totalUcane = ucane.balanceOfToken(address(this));
+            uint256 ucanaToUcane = ucana.getUmToken1EquivaleQuantosToken3() * (this.getTotalValorNaBolsaUCANA() / WAD);
+            uint256 ucanuToUcane = ucanu.getUmToken2EquivaleQuantosToken3() * (this.getTotalValorNaBolsaUCANU() / WAD);
+            uint256 totalUcane = this.getTotalValorNaBolsaUCANE();
 
             if (ucanaToUcane > totalUcane) {
                 pivoName = "UCANA";
@@ -140,9 +138,9 @@ contract EthSwap
     }
 
     function sortInitialPivo() public {
-        int256 totalUcana = int256(getTotalValorNaBolsaUCANA()); // M1
-        int256 totalUcane = int256(getTotalValorNaBolsaUCANE()); // M2
-        int256 totalUcanu = int256(getTotalValorNaBolsaUCANU()); // M3
+        int totalUcana = int(this.getTotalValorNaBolsaUCANA()); // M1
+        int totalUcane = int(this.getTotalValorNaBolsaUCANE()); // M2
+        int totalUcanu = int(this.getTotalValorNaBolsaUCANU()); // M3
 
         if (totalUcana < totalUcane && totalUcana < totalUcanu) {
             pivoName = "UCANA";

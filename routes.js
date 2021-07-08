@@ -272,7 +272,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
             const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
             const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
 
-
             res.status(200).json({
                 status: 200,
                 message: 'Balances of Exchange',

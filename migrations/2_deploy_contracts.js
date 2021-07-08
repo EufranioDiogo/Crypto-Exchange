@@ -19,10 +19,12 @@ module.exports = async function(deployer) {
     const ethSwap = await EthSwap.deployed()
 
     // Transfer all tokens to EthSwap (1 million)
-    await token.transfer(ethSwap.address,  '30' + '000000000000000000'); // UCANA
-    await token2.transfer(ethSwap.address, '10' + '000000000000000000'); // UCANU
+    await token.transfer(ethSwap.address,  '51' + '000000000000000000'); // UCANA
+    await token2.transfer(ethSwap.address, '34' + '000000000000000000'); // UCANU
     await token3.transfer(ethSwap.address, '50' + '000000000000000000'); // UCANE
 
+    await ethSwap.sortInitialPivo();
+  
     console.log('Quant tokens 1 exchange')
     console.log((await token.balanceOf(ethSwap.address)).toString());
     console.log('Quant tokens 2 exchange')

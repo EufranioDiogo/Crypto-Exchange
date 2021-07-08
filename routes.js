@@ -11,6 +11,7 @@ const getCircularReplacer = () => {
     };
 };
 const fs = require('fs');
+const { restart } = require('nodemon');
 //const { RESERVED_EVENTS } = require('socket.io/dist/socket');
 
 
@@ -293,35 +294,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
             return;
         })
     })
-
-
-    app.get('/stockExchange', (req, res) => {
-        const idEstudante = req.body.idEstudante;
-
-        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
-            const totalUCANA = await exchangeContract.methods.getTotalValorNaBolsaUCANA().call();
-            const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
-            const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
-
-            res.status(200).json({
-                status: 200,
-                message: 'Balances of Exchange',
-                balances: {
-                    ucana: totalUCANA,
-                    ucanu: totalUCANU,
-                    ucane: totalUCANE
-                }
-            });
-            return;
-        }).catch((error) => {
-            res.status(500).json({
-                status: 500,
-                message: error
-            })
-            return;
-        })
-    })
-
 }
 
 module.exports = routes

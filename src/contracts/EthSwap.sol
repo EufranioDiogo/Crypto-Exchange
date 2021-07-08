@@ -64,7 +64,6 @@ contract EthSwap
             }
         }
 
-
         if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
             uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANU() / WAD);
             uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANE() / WAD);

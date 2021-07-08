@@ -60,7 +60,7 @@ contract EthSwap
                 ucanu.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken2() * amount);
             }
         }
-/*
+
         if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
             uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANU() / WAD);
             uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANE() / WAD);
@@ -97,7 +97,7 @@ contract EthSwap
                 pivoName = "UCANU";
                 setNewPivo(pivoName);
             }
-        }*/
+        }
     }
 
     function getIdPivo() public returns (string memory) {

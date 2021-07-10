@@ -1,7 +1,7 @@
 
 require('dotenv').config();
 const PORT = 3001;
-const IP = '192.168.128.15'
+const IP = '192.168.1.11'
 //const IP = '127.0.0.1'
 const express = require('express')
 const app =express()
@@ -10,8 +10,11 @@ const Web3 = require('web3');
 const mongodb = require('mongodb').MongoClient;
 const contract = require('truffle-contract');
 const artifacts = require('./src/abis/EthSwap.json');
+const cors = require('cors');
+
 let web3;
 app.use(express.json());
+app.use(cors());
 
 if (typeof web3 !== 'undefined') {
     web3 = new Web3(web3.currentProvider)

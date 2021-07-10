@@ -17,7 +17,7 @@ const { restart } = require('nodemon');
 
 
 function routes(app, dbUsers, lms, accounts, web3) {
-    const dbUser = dbUsers.collection('exchange-users')
+    const dbUser = dbUsers.collection('exchange-users');
     const exchange = dbUsers.collection('exchange-store')
     const exchangeAddress = lms.address;
 
@@ -294,6 +294,13 @@ function routes(app, dbUsers, lms, accounts, web3) {
             return;
         })
     })
+
+    app.get('/students', async (req, res) => {
+        const data = await dbUsers.collection('exchange-users').findAll();
+
+        return res.status(200).send(data);
+    })
 }
 
 module.exports = routes
+

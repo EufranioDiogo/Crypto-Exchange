@@ -17,8 +17,18 @@ contract EthSwap
     uint256 constant WAD = 10**18;
     uint rangeLimit = 10;
     address public owner;
-    mapping(address => uint256) public balanceOfToken1;
     string public pivoName = "";
+
+    struct order {
+        address owner;
+        string tokenName;
+        uint quantOfTokens;
+        uint limitPrice;
+        bool isCompleted;
+    }
+
+    order[] sellOrders;
+    order[] buyOrders;
 
 
     constructor(Token _token, Token2 _ucanu, Token3 _ucane) public
@@ -29,15 +39,36 @@ contract EthSwap
         owner = msg.sender;
     }
 
-    /*
-    
-    */
+
+    function placeOrder(uint _limitPrice, string memory _tokenName, uint _quantOfTokens, uint8 _orderType) public {
+        if (keccak256(bytes(_tokenName)) == keccak256("UCANA")) {
+            require(ucana.balanceOf(msg.sender) >= _limitPrice * WAD);
+        } else if (keccak256(bytes(_tokenName)) == keccak256("UCANU")) {
+            require(ucanu.balanceOf(msg.sender) >= _limitPrice * WAD);
+        } else if (keccak256(bytes(_tokenName)) == keccak256("UCANE")) {
+            require(ucane.balanceOf(msg.sender) >= _limitPrice * WAD);
+        }
+
+        order storage newOrder = order({
+                owner: msg.sender,
+                tokenName: _tokenName,
+                quantOfTokens: _quantOfTokens,
+                limitPrice: _limitPrice,
+                isCompleted: false
+            });
+
+        if (_orderType == 0) {
+            sellOrders.push(newOrder);
+        } else {
+            buyOrders.push(newOrder);
+        }
+    }
+
     function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
         if (keccak256(bytes(orig)) == keccak256("UCANA")) {
             require(ucana.balanceOf(_from) >= amount * WAD);
 
             ucana.transferFrom(_from, _to, amount * WAD);
-//
             if (keccak256(bytes(dest)) == keccak256("UCANU")) {
                 ucanu.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken2() * amount);
             } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
@@ -56,7 +87,7 @@ contract EthSwap
         } else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
             require(ucane.balanceOf(_from) >= amount * WAD);
             ucane.transferFrom(_from, _to, amount * WAD);
-//
+
             if (keccak256(bytes(dest)) == keccak256("UCANU")) {
                 ucanu.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken2() * amount);
             } else if (keccak256(bytes(dest)) == keccak256("UCANA")) {
@@ -103,10 +134,6 @@ contract EthSwap
         }
     }
 
-
-
-
- 
     function getIdPivo() public returns (string memory) {
         return pivoName;
     }

@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.4.16 <0.9.0;
+pragma solidity >=0.5.0 <0.9.0;
 
 import "./Token.sol";
 import "./Token2.sol";
@@ -18,18 +18,24 @@ contract EthSwap
     uint rangeLimit = 10;
     address public owner;
     string public pivoName = "";
+    bool isFirstOrderPlaced = true;
 
-    struct order {
+    struct Order {
         address owner;
-        string tokenName;
-        uint quantOfTokens;
-        uint limitPrice;
+        string targetTokenName;
+        uint quantTokensTarget;
+        string offeredTokenName;
+        uint quantTokensOffered;
         bool isCompleted;
     }
+    uint sizeBuyOrders = 0;
+    uint sizeSellOrders = 0;
+    mapping(uint => Order) public buyOrders;
+    mapping(uint => Order) public sellOrders;
+    uint indexOfBuyOrdersToShow = 0;
+    uint indexOfSellOrdersToShow = 0;
 
-    order[] sellOrders;
-    order[] buyOrders;
-
+    event placeOrderEvent(bool matchResult);
 
     constructor(Token _token, Token2 _ucanu, Token3 _ucane) public
     {
@@ -40,97 +46,63 @@ contract EthSwap
     }
 
 
-    function placeOrder(uint _limitPrice, string memory _tokenName, uint _quantOfTokens, uint8 _orderType) public {
-        if (keccak256(bytes(_tokenName)) == keccak256("UCANA")) {
-            require(ucana.balanceOf(msg.sender) >= _limitPrice * WAD);
-        } else if (keccak256(bytes(_tokenName)) == keccak256("UCANU")) {
-            require(ucanu.balanceOf(msg.sender) >= _limitPrice * WAD);
-        } else if (keccak256(bytes(_tokenName)) == keccak256("UCANE")) {
-            require(ucane.balanceOf(msg.sender) >= _limitPrice * WAD);
-        }
-
-        order storage newOrder = order({
-                owner: msg.sender,
-                tokenName: _tokenName,
-                quantOfTokens: _quantOfTokens,
-                limitPrice: _limitPrice,
-                isCompleted: false
-            });
+    function placeOrder(string memory _targetTokenName, uint _quantTokensTarget, string memory _offeredTokenName, uint _quantTokensOffered, uint _orderType) public {
+        Order memory newOrder = Order(msg.sender, _targetTokenName, _quantTokensTarget, _offeredTokenName, _quantTokensOffered, false);
 
         if (_orderType == 0) {
-            sellOrders.push(newOrder);
+            sellOrders[sizeSellOrders] = newOrder;
+            sizeSellOrders++;
         } else {
-            buyOrders.push(newOrder);
+            buyOrders[sizeBuyOrders] = newOrder;
+            sizeBuyOrders++;
         }
+
+        emit placeOrderEvent(checkMatches());
     }
 
-    function swap(address _from, address _to, uint256 amount, string memory orig, string memory dest) public payable {
-        if (keccak256(bytes(orig)) == keccak256("UCANA")) {
-            require(ucana.balanceOf(_from) >= amount * WAD);
+    function checkMatches() public returns (bool) {
+        uint i = 0;
+        uint j = 0;
 
-            ucana.transferFrom(_from, _to, amount * WAD);
-            if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                ucanu.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken2() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                ucane.transferFrom(_to, _from, ucana.getUmToken1EquivaleQuantosToken3() * amount);
-            }
-        } else if (keccak256(bytes(orig)) == keccak256("UCANU")) {
-            require(ucanu.balanceOf(_from) >= amount * WAD);
+        for (; i < sizeBuyOrders; i++) {
+            if (!buyOrders[i].isCompleted) {
+                for (j = 0; j < sizeSellOrders; j++) {
+                    if (!sellOrders[j].isCompleted) {
+                        if (keccak256(bytes(buyOrders[i].targetTokenName)) == keccak256(bytes(sellOrders[j].offeredTokenName)) && keccak256(bytes(buyOrders[i].offeredTokenName)) == keccak256(bytes(sellOrders[j].targetTokenName))) {
+                            if (buyOrders[i].quantTokensOffered >= sellOrders[j].quantTokensTarget && buyOrders[i].quantTokensTarget <= sellOrders[j].quantTokensOffered) {
+                                swap(buyOrders[i].owner, sellOrders[j].owner, buyOrders[i].quantTokensOffered, buyOrders[i].offeredTokenName);
 
-            ucanu.transferFrom(_from, _to, amount * WAD);
-//
-            if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                ucana.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken1() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANE")) {
-                ucane.transferFrom(_to, _from, ucanu.getUmToken2EquivaleQuantosToken3() * amount);
-            }
-        } else if (keccak256(bytes(orig)) == keccak256("UCANE")) {
-            require(ucane.balanceOf(_from) >= amount * WAD);
-            ucane.transferFrom(_from, _to, amount * WAD);
+                                swap(sellOrders[j].owner, buyOrders[i].owner, sellOrders[j].quantTokensOffered, sellOrders[j].offeredTokenName);
 
-            if (keccak256(bytes(dest)) == keccak256("UCANU")) {
-                ucanu.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken2() * amount);
-            } else if (keccak256(bytes(dest)) == keccak256("UCANA")) {
-                ucana.transferFrom(_to, _from, ucane.getUmToken3EquivaleQuantosToken1() * amount);
+                                buyOrders[i].isCompleted = true;
+                                sellOrders[j].isCompleted = true;
+
+                                return true;
+                                /*return ("Buyer: " + buyOrders[i].owner + "\nOffered Token: " + buyOrders[i].offeredTokenName + "\nQuant Token: " + buyOrders[i].quantTokensOffered + "\nTarget Token: " + sellOrders[j].offeredTokenName + "\nQuant Token: " + sellOrders[j].quantTokensOffered  + "\nSeller: " + sellOrders[j].owner,
+                                "Seller: " + sellOrders[j].owner + "\nOffered Token: " + sellOrders[j].offeredTokenName + "\nQuant Token: " + sellOrders[j].quantTokensOffered + "\nTarget Token: " + buyOrders[i].offeredTokenName + "\nQuant Token: " + buyOrders[i].quantTokensOffered  + "\nBuyer: " + buyOrders[i].owner
+                                );*/
+                            }
+                        }
+                    }
+                }
             }
         }
+        return false;
+    }
 
-        if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
-            uint256 ucanuToUcana = ucanu.getUmToken2EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANU() / WAD);
-            uint256 ucaneToUcana = ucane.getUmToken3EquivaleQuantosToken1() * (this.getTotalValorNaBolsaUCANE() / WAD);
-            uint256 totalUcana = this.getTotalValorNaBolsaUCANA();
+    function swap(address _from, address _to, uint256 amount, string memory tokenName) public payable {
+        if (keccak256(bytes(tokenName)) == keccak256("UCANA")) {
+            require(ucana.balanceOf(_from) >= amount * WAD, "Not enough01 Ether provided.");
 
-            if (ucaneToUcana > totalUcana) {
-                pivoName = "UCANE";
-                setNewPivo(pivoName);
-            } else if (ucanuToUcana > totalUcana) {
-                pivoName = "UCANU";
-                setNewPivo(pivoName);
-            }
-        } else if (keccak256(bytes(pivoName)) == keccak256("UCANU")) {
-            uint256 ucanaToUcanu = ucana.getUmToken1EquivaleQuantosToken2() * (this.getTotalValorNaBolsaUCANA() / WAD);
-            uint256 ucaneToUcanu = ucane.getUmToken3EquivaleQuantosToken2() * (this.getTotalValorNaBolsaUCANE() / WAD);
-            uint256 totalUcanu = this.getTotalValorNaBolsaUCANU();
+            ucana.transferFrom(_from, _to, amount * WAD);
+        } else if (keccak256(bytes(tokenName)) == keccak256("UCANU")) {
+            require(ucanu.balanceOf(_from) >= amount * WAD, "Not enough02 Ether provided.");
 
-            if (ucanaToUcanu > totalUcanu) { 
-                pivoName = "UCANA";
-                setNewPivo(pivoName);
-            } else if (ucaneToUcanu > totalUcanu) {
-                pivoName = "UCANE";
-                setNewPivo(pivoName);
-            }
-        } else if (keccak256(bytes(pivoName)) == keccak256("UCANE")) {
-            uint256 ucanaToUcane = ucana.getUmToken1EquivaleQuantosToken3() * (this.getTotalValorNaBolsaUCANA() / WAD);
-            uint256 ucanuToUcane = ucanu.getUmToken2EquivaleQuantosToken3() * (this.getTotalValorNaBolsaUCANU() / WAD);
-            uint256 totalUcane = this.getTotalValorNaBolsaUCANE();
+            ucanu.transferFrom(_from, _to, amount * WAD);
+        } else if (keccak256(bytes(tokenName)) == keccak256("UCANE")) {
+            require(ucane.balanceOf(_from) >= amount * WAD, "Not enough03 Ether provided.");
 
-            if (ucanaToUcane > totalUcane) {
-                pivoName = "UCANA";
-                setNewPivo(pivoName);
-            } else if (ucanuToUcane > totalUcane) {
-                pivoName = "UCANU";
-                setNewPivo(pivoName);
-            }
+            ucane.transferFrom(_from, _to, amount * WAD);
         }
     }
 
@@ -232,5 +204,36 @@ contract EthSwap
     function getTotalValorNaBolsaUCANE() public returns (uint256)
     {
         return  ucane.balanceOf(address(this));
+    }
+
+    function getBuyOrders() public returns (address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
+        Order memory orderSelected = buyOrders[indexOfBuyOrdersToShow];
+
+
+        if (indexOfBuyOrdersToShow < getBuyOrdersSize()) {
+            return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+        }
+        indexOfBuyOrdersToShow = 0;
+        return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+    }
+
+    function getSellOrders() public returns (address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
+        Order memory orderSelected = buyOrders[indexOfSellOrdersToShow];
+
+
+        if (indexOfSellOrdersToShow < getSellOrdersSize()) {
+            return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+        }
+        indexOfSellOrdersToShow = 0;
+        return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+    }
+
+
+    function getBuyOrdersSize() public returns (uint) {
+        return sizeSellOrders;
+    }
+
+    function getSellOrdersSize() public returns (uint) {
+        return sizeSellOrders;
     }
 }

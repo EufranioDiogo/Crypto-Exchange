@@ -12,6 +12,7 @@ const getCircularReplacer = () => {
 };
 const fs = require('fs');
 const { restart } = require('nodemon');
+let requestExchangeBuyOrdersRunning = false;
 //const { RESERVED_EVENTS } = require('socket.io/dist/socket');
 
 
@@ -27,29 +28,29 @@ function routes(app, dbUsers, lms, accounts, web3) {
     const exchangeContract = new web3.eth.Contract(exchangeABI, exchangeAddress);
 
     /* Função responsavel para fazer o uma transação, no caso trocar uma determinada
-    quantidade de uma tua crypto moeda por outra com a exchange
-    e de realçar que qualquer chamada dela, ela passa por mecanismos de segurança para
-    evitar burlas ao sistema, como a verificação da private key, o id do estudante 
-    entre outros
+            quantidade de uma tua crypto moeda por outra com a exchange
+            e de realçar que qualquer chamada dela, ela passa por mecanismos de segurança para
+            evitar burlas ao sistema, como a verificação da private key, o id do estudante 
+            entre outros
     
-    Como chamar:
-    rota -> http://127.0.0.1:3001/swap 
+            Como chamar:
+            rota -> http://127.0.0.1:3001/swap 
     
-    O que passar:
-    {
-        "idEstudante": "string",
-        "idConta": "string, id da conta é fornecido pelo ganache",
-        "privateKey": "string também fornecida pelo ganache",
-        "orig": "string, pode ser (UCANU, UCANA, UCANE)",
-        "dest": "string, pode ser (UCANU, UCANA, UCANE)",
-        "amount": "string, definindo o quanto queremos fazer a de transferència, exemplo: 10, significa 10 unidades da moeda origem que pretendes trocar pela moeda destino"
-    }
-    */
-    app.post('/swap', async (req, res) => {
+            O que passar:
+            {
+                "idEstudante": "string",
+                "idConta": "string, id da conta é fornecido pelo ganache",
+                "privateKey": "string também fornecida pelo ganache",
+                "orig": "string, pode ser (UCANU, UCANA, UCANE)",
+                "dest": "string, pode ser (UCANU, UCANA, UCANE)",
+                "amount": "string, definindo o quanto queremos fazer a de transferència, exemplo: 10, significa 10 unidades da moeda origem que pretendes trocar pela moeda destino"
+            }
+            */
+    app.post('/placeOrder', async(req, res) => {
         const idEstudante = req.body.idEstudante;
 
 
-        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+        dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
             const privateKey = req.body.privateKey;
 
             if (privateKey != data.privateKey) {
@@ -59,11 +60,14 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 })
                 return;
             } else {
-                const origCrypto = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
-                const destCrypto = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
+                const offeredTokenName = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
+                const targetTokenName = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
+                const quantTokensTarget = String(req.body.quantTokensTarget);
+                const quantTokensOffered = String(req.body.quantTokensOffered);
+                const orderType = Number.parseInt(req.body.orderType);
 
                 /*
-                if (origCrypto != 'UCANU' || origCrypto != 'UCANA' || origCrypto != 'UCANE') {
+                if (offeredTokenName  != 'UCANU' || offeredTokenName  != 'UCANA' || offeredTokenName  != 'UCANE') {
                     res.status(400).json({
                         "status": 400,
                         "message": "Orig Token not defined"
@@ -71,7 +75,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     return;
                 }
 
-                if (destCrypto != 'UCANU' || destCrypto != 'UCANA' || destCrypto != 'UCANE') {
+                if (targetTokenName != 'UCANU' || targetTokenName != 'UCANA' || targetTokenName != 'UCANE') {
                     res.status(400).json({
                         "status": 400,
                         "message": "Dest Token not defined"
@@ -84,39 +88,28 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
                 const detailsOfTransfer = {
                     from: idConta,
-                    to: exchangeAddress
+                    gas: 3000000
                 }
 
-                exchangeContract.methods.swap(idConta, exchangeAddress, amount, origCrypto, destCrypto)
-                    .send(detailsOfTransfer)
-                    .then(async (result) => {
-                        console.log(result);
+                try {
+                    const returnedValue = await exchangeContract.methods.placeOrder(targetTokenName, quantTokensTarget, offeredTokenName, quantTokensOffered, orderType).send(detailsOfTransfer);
 
-                        res.status(200).json({
-                            "message": result
-                        })
-                        return;
+                    console.log(returnedValue)
+                        //console.log(returnedValue.events.placeOrderEvent.returnValues)
+                    res.status(200).json({
+                        "message": "Order placed",
+                        "value": returnedValue.events.placeOrderEvent.returnValues.matchResult
+
                     })
-                    .catch(async function (err) {
-                        console.log('err...\n' + err);
+                    return;
+                } catch (err) {
+                    console.log('err...\n' + err);
 
-                        res.status(200).json({
-                            "message": err
-                        })
-                        return;
+                    res.status(200).json({
+                        "message": err
                     })
-
-                /*    
-                
-
-                if (origCrypto == destCrypto) {
-                    res.status(400).json({
-                        "error": 400,
-                        "message": "You can't swap the same cryptos"
-                    })
-                } else {
-                    
-                }*/
+                    return;
+                }
             }
         }).catch((error) => {
             res.status(404).json({
@@ -132,7 +125,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         const privateKey = req.body.privateKey;
         const idConta = req.body.idConta;
 
-        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+        dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
             const studentPrivateKey = data.privateKey;
 
             const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({ from: idConta });
@@ -158,9 +151,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
             return;
         })
     })
-
-
-
 
     app.post('/register', (req, res) => {
         const idEstudante = req.body.idEstudante;
@@ -204,12 +194,10 @@ function routes(app, dbUsers, lms, accounts, web3) {
         }
     })
 
-
-
     app.get('/exchange', (req, res) => {
         const idEstudante = req.body.idEstudante;
 
-        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+        dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
             const relationsToken1 = {
                 relations: await exchangeContract.methods.getRelationOfToken1().call(),
             }
@@ -265,13 +253,40 @@ function routes(app, dbUsers, lms, accounts, web3) {
         })
     })
 
+    app.get('/getBuyOrders', (req, res) => {
+        requestExchangeBuyOrdersRunning = true;
+        const idEstudante = req.params.idEstudante;
+        const privateKey = req.body.privateKey;
+        const idConta = req.body.idConta;
 
-    // magic function 
+        dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
+            const studentPrivateKey = data.privateKey;
 
+            const buyOrders = await exchangeContract.methods.getBuyOrders().call({ from: idConta });
+            const sellOrders = await exchangeContract.methods.getSellOrders().call({ from: idConta });
+
+            res.status(200).json({
+                status: 200,
+                message: 'Balances of your account',
+                balances: {
+                    buyOrders: buyOrders,
+                    sellOrders: sellOrders
+                }
+            });
+            return;
+
+        }).catch((error) => {
+            res.status(500).json({
+                status: 500,
+                message: ''
+            })
+            return;
+        })
+    })
     app.get('/stockExchange', (req, res) => {
         const idEstudante = req.body.idEstudante;
 
-        dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
+        dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
             const totalUCANA = await exchangeContract.methods.getTotalValorNaBolsaUCANA().call();
             const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
             const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
@@ -295,7 +310,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         })
     })
 
-    app.get('/students', async (req, res) => {
+    app.get('/students', async(req, res) => {
         const data = await dbUsers.collection('exchange-users').findAll();
 
         return res.status(200).send(data);
@@ -303,4 +318,3 @@ function routes(app, dbUsers, lms, accounts, web3) {
 }
 
 module.exports = routes
-

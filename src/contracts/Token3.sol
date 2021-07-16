@@ -10,7 +10,6 @@ contract Token3 is StandardToken
     string public symbol = "UCANE";
     uint public decimals = 18;
     uint public INITIAL_SUPPLY = 1500001 * (10 ** decimals);
-    uint256 public totalSupply_;
     uint256  public umToken3EquivaleQuantosToken1 = 0;
     uint256  public umToken3EquivaleQuantosToken2 = 0;
 

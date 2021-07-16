@@ -8,7 +8,6 @@ contract Token2 is StandardToken
     string public symbol = "UCANU";
     uint public decimals = 18;
     uint public INITIAL_SUPPLY = 1500001 * (10 ** decimals);
-    uint256 public totalSupply_;
     uint256  public umToken2EquivaleQuantosToken1 = 0;
     uint256  public umToken2EquivaleQuantosToken3 = 0;
     

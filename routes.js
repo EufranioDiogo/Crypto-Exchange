@@ -426,9 +426,17 @@ function routes(app, dbUsers, lms, accounts, web3) {
   })
 
   app.get('/students', async (req, res) => {
-    const data = await dbUsers.collection('exchange-users').findAll();
-
-    return res.status(200).send(data);
+    try {
+      const data = await dbUser.find({}).toArray();
+      console.log(data)
+      res.status(200).send(data);
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({
+        status: 500,
+        message: error
+      })
+    }
   })
 
   app.get('/exchangeMarketMoviment', async (req, res) => {

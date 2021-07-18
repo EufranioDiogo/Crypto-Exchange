@@ -21,6 +21,7 @@ contract EthSwap
     bool isFirstOrderPlaced = true;
 
     struct Order {
+        uint id;
         address owner;
         string targetTokenName;
         uint quantTokensTarget;
@@ -28,12 +29,12 @@ contract EthSwap
         uint quantTokensOffered;
         bool isCompleted;
     }
+
     uint sizeBuyOrders = 0;
     uint sizeSellOrders = 0;
     mapping(uint => Order) public buyOrders;
     mapping(uint => Order) public sellOrders;
-    uint indexOfBuyOrdersToShow = 0;
-    uint indexOfSellOrdersToShow = 0;
+    uint idOrder = 0;
 
     event placeOrderEvent(bool matchResult);
 
@@ -47,7 +48,7 @@ contract EthSwap
 
 
     function placeOrder(string memory _targetTokenName, uint _quantTokensTarget, string memory _offeredTokenName, uint _quantTokensOffered, uint _orderType) public {
-        Order memory newOrder = Order(msg.sender, _targetTokenName, _quantTokensTarget, _offeredTokenName, _quantTokensOffered, false);
+        Order memory newOrder = Order(idOrder, msg.sender, _targetTokenName, _quantTokensTarget, _offeredTokenName, _quantTokensOffered, false);
 
         if (_orderType == 0) {
             sellOrders[sizeSellOrders] = newOrder;
@@ -56,6 +57,7 @@ contract EthSwap
             buyOrders[sizeBuyOrders] = newOrder;
             sizeBuyOrders++;
         }
+        idOrder += 1;
 
         emit placeOrderEvent(checkMatches());
     }
@@ -78,9 +80,6 @@ contract EthSwap
                                 sellOrders[j].isCompleted = true;
 
                                 return true;
-                                /*return ("Buyer: " + buyOrders[i].owner + "\nOffered Token: " + buyOrders[i].offeredTokenName + "\nQuant Token: " + buyOrders[i].quantTokensOffered + "\nTarget Token: " + sellOrders[j].offeredTokenName + "\nQuant Token: " + sellOrders[j].quantTokensOffered  + "\nSeller: " + sellOrders[j].owner,
-                                "Seller: " + sellOrders[j].owner + "\nOffered Token: " + sellOrders[j].offeredTokenName + "\nQuant Token: " + sellOrders[j].quantTokensOffered + "\nTarget Token: " + buyOrders[i].offeredTokenName + "\nQuant Token: " + buyOrders[i].quantTokensOffered  + "\nBuyer: " + buyOrders[i].owner
-                                );*/
                             }
                         }
                     }
@@ -206,31 +205,21 @@ contract EthSwap
         return  ucane.balanceOf(address(this));
     }
 
-    function getBuyOrders() public returns (address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
-        Order memory orderSelected = buyOrders[indexOfBuyOrdersToShow];
+    function getBuyOrder(uint orderIndex) public returns (uint id, address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
+        Order memory orderSelected = buyOrders[orderIndex];
 
 
-        if (indexOfBuyOrdersToShow < getBuyOrdersSize()) {
-            return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
-        }
-        indexOfBuyOrdersToShow = 0;
-        return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+        return (orderSelected.id, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
     }
 
-    function getSellOrders() public returns (address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
-        Order memory orderSelected = buyOrders[indexOfSellOrdersToShow];
+    function getSellOrder(uint orderIndex) public returns (uint id, address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
+        Order memory orderSelected = sellOrders[orderIndex];
 
-
-        if (indexOfSellOrdersToShow < getSellOrdersSize()) {
-            return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
-        }
-        indexOfSellOrdersToShow = 0;
-        return (orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+        return (orderSelected.id, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
     }
-
 
     function getBuyOrdersSize() public returns (uint) {
-        return sizeSellOrders;
+        return sizeBuyOrders;
     }
 
     function getSellOrdersSize() public returns (uint) {

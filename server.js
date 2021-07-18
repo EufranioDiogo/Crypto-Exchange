@@ -1,7 +1,7 @@
 require('dotenv').config();
 const PORT = 3001;
-const IP = '192.168.1.12';
-//const IP = '127.0.0.1'
+//const IP = '192.168.1.12';
+const IP = '127.0.0.1'
 const express = require('express')
 const app = express()
 const routes = require('./routes')

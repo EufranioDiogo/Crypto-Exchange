@@ -233,6 +233,24 @@ contract EthSwap
         return (orderSelected.id, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
     }
 
+    function getMyBuyOrder(uint orderIndex) public returns (uint id, address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
+        Order memory orderSelected = buyOrders[orderIndex];
+
+        if (orderSelected.owner == msg.sender) {
+            return (orderSelected.id, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+        }
+        return (-1, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+    }
+
+    function getMySellOrder(uint orderIndex) public returns (uint id, address owner, string memory targetTokenName, uint quantTokensTarget, string memory offeredTokenName, uint quantTokensOffered, bool isCompleted) {
+        Order memory orderSelected = sellOrders[orderIndex];
+
+        if (orderSelected.owner == msg.sender) {
+            return (orderSelected.id, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+        }
+        return (-1, orderSelected.owner, orderSelected.targetTokenName, orderSelected.quantTokensTarget, orderSelected.offeredTokenName, orderSelected.quantTokensOffered, orderSelected.isCompleted);
+    }
+
     function getBuyOrdersSize() public returns (uint) {
         return sizeBuyOrders;
     }

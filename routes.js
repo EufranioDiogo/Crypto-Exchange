@@ -10,12 +10,22 @@ const getCircularReplacer = () => {
         return value;
     };
 };
+const { timeStamp } = require('console');
 const fs = require('fs');
 const { restart } = require('nodemon');
 let requestExchangeBuyOrdersRunning = false;
 //const { RESERVED_EVENTS } = require('socket.io/dist/socket');
 const buyOrdersMappings = [];
 const sellOrdersMappings = [];
+let quantTokensUCANATransfered = 0;
+let quantTokensUCANUTransfered = 0;
+let quantTokensUCANETransfered = 0;
+let exchangeMarketTimeStamp = 0;
+let timeStampToUpdateExchangeMarketMovimento = 20;
+
+const exchangeMarketMovement = [];
+
+setInterval(exchangeMarketMovementFunction, timeStampToUpdateExchangeMarketMovimento);
 
 
 function routes(app, dbUsers, lms, accounts, web3) {
@@ -100,6 +110,13 @@ function routes(app, dbUsers, lms, accounts, web3) {
                         await updateBuyOrdersMappings();
                     }
 
+                    if (offeredTokenName == 'UCANA') {
+                        quantTokensUCANATransfered += Number.parseInt(quantTokensOffered);
+                    } else if (offeredTokenName == 'UCANU') {
+                        quantTokensUCANUTransfered += Number.parseInt(quantTokensOffered);
+                    } else {
+                        quantTokensUCANETransfered += Number.parseInt(quantTokensOffered);
+                    }
                     res.status(200).json({
                         "message": "Order placed",
                         "value": returnedValue.events.placeOrderEvent.returnValues.matchResult
@@ -261,26 +278,125 @@ function routes(app, dbUsers, lms, accounts, web3) {
         res.status(200).json({
             status: 200,
             message: 'Buy orders Mappings',
-            balances: {
-                buyOrders: buyOrdersMappings,
-            }
+            buyOrders: buyOrdersMappings,
         });
         return;
     })
-
-
 
     app.get('/getSellOrders', (req, res) => {
         res.status(200).json({
             status: 200,
             message: 'Sell orders Mappings',
-            balances: {
-                sellOrders: sellOrdersMappings,
-            }
+            sellOrders: sellOrdersMappings,
         });
         return;
-
     })
+
+    app.get('/getBuyOrders/:idConta', (req, res) => {
+        const idConta = req.params.idConta;
+        const privateKey = req.body.privateKey;
+
+        dbUser.findOne({ idConta: idConta }).then(async(data) => {
+            if (data.privateKey == privateKey) {
+                const myBuyOrders = [];
+
+                myBuyOrders.splice(0, myBuyOrders.length);
+                let index = 0;
+                let quantBuyOrders = await exchangeContract.methods.getBuyOrdersSize().call({ from: exchangeAddress });
+                let order;
+
+                while (quantBuyOrders) {
+                    order = await exchangeContract.methods.getMyBuyOrder(index).call({ from: idConta });
+                    if (order.id != -1) {
+                        myBuyOrders.push({
+                            id: order.id,
+                            owner: order.owner,
+                            targetTokenName: order.targetTokenName,
+                            quantTokensTarget: order.quantTokensTarget,
+                            offeredTokenName: order.offeredTokenName,
+                            quantTokensOffered: order.quantTokensOffered,
+                            isCompleted: order.isCompleted
+                        });
+                    }
+
+                    index++;
+                    quantBuyOrders -= 1;
+                }
+
+
+                res.status(200).json({
+                    status: 200,
+                    message: 'My Buy orders Mappings',
+                    buyOrders: myBuyOrders,
+                });
+                return;
+            } else {
+                res.status(200).json({
+                    status: 200,
+                    message: 'Not authorized Transaction'
+                });
+                return;
+            }
+
+        }).catch(err => res.status(400).json({
+            status: 200,
+            message: "Account not founded"
+        }))
+    });
+
+    app.get('/getSellOrders/:idConta', (req, res) => {
+        const idConta = req.params.idConta;
+        const privateKey = req.body.privateKey;
+
+        dbUser.findOne({ idConta: idConta }).then(async(data) => {
+            if (data.privateKey == privateKey) {
+                const mySellOrders = [];
+
+                mySellOrders.splice(0, mySellOrders.length);
+                let index = 0;
+                let quantBuyOrders = await exchangeContract.methods.getSellOrdersSize().call({ from: exchangeAddress });
+                let order;
+
+                while (quantBuyOrders) {
+                    order = await exchangeContract.methods.getMySellOrder(index).call({ from: idConta });
+
+                    if (order.id != -1) {
+                        mySellOrders.push({
+                            id: order.id,
+                            owner: order.owner,
+                            targetTokenName: order.targetTokenName,
+                            quantTokensTarget: order.quantTokensTarget,
+                            offeredTokenName: order.offeredTokenName,
+                            quantTokensOffered: order.quantTokensOffered,
+                            isCompleted: order.isCompleted
+                        });
+                    }
+
+
+                    index++;
+                    quantBuyOrders -= 1;
+                }
+
+
+                res.status(200).json({
+                    status: 200,
+                    message: 'My Buy orders Mappings',
+                    buyOrders: mySellOrders,
+                });
+                return;
+            } else {
+                res.status(200).json({
+                    status: 200,
+                    message: 'Not authorized Transaction'
+                });
+                return;
+            }
+
+        }).catch(err => res.status(400).json({
+            status: 200,
+            message: "Account not founded"
+        }))
+    });
 
 
     app.get('/stockExchange', (req, res) => {
@@ -304,7 +420,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         }).catch((error) => {
             res.status(500).json({
                 status: 500,
-                message: ''
+                message: error
             })
             return;
         })
@@ -316,6 +432,13 @@ function routes(app, dbUsers, lms, accounts, web3) {
         return res.status(200).send(data);
     })
 
+    app.get('/exchangeMarketMoviment', async(req, res) => {
+        return res.status(200).json({
+            exchangeMarketMovement
+        });
+    })
+
+
     async function updateSellOrdersMappings() {
         sellOrdersMappings.splice(0, sellOrdersMappings.length);
         let index = 0;
@@ -324,7 +447,15 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
         while (quantSellOrders) {
             order = await exchangeContract.methods.getSellOrder(index).call({ from: exchangeAddress });
-            sellOrdersMappings.push(order);
+            sellOrdersMappings.push({
+                id: order.id,
+                owner: order.owner,
+                targetTokenName: order.targetTokenName,
+                quantTokensTarget: order.quantTokensTarget,
+                offeredTokenName: order.offeredTokenName,
+                quantTokensOffered: order.quantTokensOffered,
+                isCompleted: order.isCompleted
+            });
 
             index++;
             quantSellOrders -= 1;
@@ -339,7 +470,15 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
         while (quantBuyOrders) {
             order = await exchangeContract.methods.getBuyOrder(index).call({ from: exchangeAddress });
-            buyOrdersMappings.push(order);
+            buyOrdersMappings.push({
+                id: order.id,
+                owner: order.owner,
+                targetTokenName: order.targetTokenName,
+                quantTokensTarget: order.quantTokensTarget,
+                offeredTokenName: order.offeredTokenName,
+                quantTokensOffered: order.quantTokensOffered,
+                isCompleted: order.isCompleted
+            });
 
             index++;
             quantBuyOrders -= 1;
@@ -348,3 +487,20 @@ function routes(app, dbUsers, lms, accounts, web3) {
 }
 
 module.exports = routes;
+
+function exchangeMarketMovementFunction() {
+    exchangeMarketTimeStamp += timeStampToUpdateExchangeMarketMovimento;
+
+    exchangeMarketMovement.push({
+        x: exchangeMarketTimeStamp,
+        'ucanaTransactedAmount': quantTokensUCANATransfered,
+        'ucanuTransactedAmount': quantTokensUCANUTransfered,
+        'ucaneTransactedAmount': quantTokensUCANETransfered,
+    })
+
+    quantTokensUCANATransfered = 0;
+    quantTokensUCANUTransfered = 0;
+    quantTokensUCANETransfered = 0;
+}
+quantTokensUCANETransfered = 0;
+}

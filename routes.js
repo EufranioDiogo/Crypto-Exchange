@@ -380,8 +380,8 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
                 res.status(200).json({
                     status: 200,
-                    message: 'My Buy orders Mappings',
-                    buyOrders: mySellOrders,
+                    message: 'My Sell orders Mappings',
+                    sellOrders: mySellOrders,
                 });
                 return;
             } else {

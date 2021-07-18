@@ -30,61 +30,115 @@ setInterval(exchangeMarketMovementFunction, timeStampToUpdateExchangeMarketMovim
 
 function routes(app, dbUsers, lms, accounts, web3) {
   const dbUser = dbUsers.collection('exchange-users');
-  const exchange = dbUsers.collection('exchange-store')
-  const exchangeAddress = lms.address;
-  // @ts-ignore
-  const exchangeContractJSON = JSON.parse(fs.readFileSync('./src/abis/EthSwap.json'), 'utf8');
-  const exchangeABI = exchangeContractJSON.abi;
-  const exchangeContract = new web3.eth.Contract(exchangeABI, exchangeAddress);
+    const exchange = dbUsers.collection('exchange-store')
+    const exchangeAddress = lms.address;
+    // @ts-ignore
+    const exchangeContractJSON = JSON.parse(fs.readFileSync('./src/abis/EthSwap.json'), 'utf8');
+    const exchangeABI = exchangeContractJSON.abi;
+    const exchangeContract = new web3.eth.Contract(exchangeABI, exchangeAddress);
 
-  /* Função responsavel para fazer o uma transação, no caso trocar uma determinada
-  quantidade de uma tua crypto moeda por outra com a exchange
-  e de realçar que qualquer chamada dela, ela passa por mecanismos de segurança para
-  evitar burlas ao sistema, como a verificação da private key, o id do estudante 
-  entre outros
+    /* Função responsavel para fazer o uma transação, no caso trocar uma determinada
+    quantidade de uma tua crypto moeda por outra com a exchange
+    e de realçar que qualquer chamada dela, ela passa por mecanismos de segurança para
+    evitar burlas ao sistema, como a verificação da private key, o id do estudante 
+    entre outros
 
-  Como chamar:
-  rota -> http://127.0.0.1:3001/swap 
+    Como chamar:
+    rota -> http://127.0.0.1:3001/swap 
 
-  O que passar:
-  {
-      "idEstudante": "string",
-      "idConta": "string, id da conta é fornecido pelo ganache",
-      "privateKey": "string também fornecida pelo ganache",
-      "orig": "string, pode ser (UCANU, UCANA, UCANE)",
-      "dest": "string, pode ser (UCANU, UCANA, UCANE)",
-      "amount": "string, definindo o quanto queremos fazer a de transferència, exemplo: 10, significa 10 unidades da moeda origem que pretendes trocar pela moeda destino"
-  }
-  */
-  app.post('/placeOrder', async (req, res) => {
-    const idEstudante = req.body.idEstudante;
+    O que passar:
+    {
+        "idEstudante": "string",
+        "idConta": "string, id da conta é fornecido pelo ganache",
+        "privateKey": "string também fornecida pelo ganache",
+        "orig": "string, pode ser (UCANU, UCANA, UCANE)",
+        "dest": "string, pode ser (UCANU, UCANA, UCANE)",
+        "amount": "string, definindo o quanto queremos fazer a de transferència, exemplo: 10, significa 10 unidades da moeda origem que pretendes trocar pela moeda destino"
+    }
+    */
+    app.post('/placeOrder', async(req, res) => {
+        const idEstudante = req.body.idEstudante;
 
 
-    dbUser.findOne({ idEstudante: idEstudante }).then(async (data) => {
-      const privateKey = req.body.privateKey;
+        dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
+            const privateKey = req.body.privateKey;
 
-      if (privateKey !== data.privateKey) {
-        res.status(404).json({
-          "status": "error, not authorized",
-          "message": "error not valid private key"
-        })
+            if (privateKey != data.privateKey) {
+                res.status(404).json({
+                    "status": "error, not authorized",
+                    "message": "error not valid private key"
+                })
 
-        return;
-      } else {
-        const offeredTokenName = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
-        const targetTokenName = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
-        const quantTokensTarget = String(req.body.quantTokensTarget);
-        const quantTokensOffered = String(req.body.quantTokensOffered);
-        const orderType = Number.parseInt(req.body.orderType);
+                return;
+            } else {
+                const offeredTokenName = String(req.body.offeredTokenName).toUpperCase(); // UCANU, UCANA, UCANE
+                const targetTokenName = String(req.body.targetTokenName).toUpperCase(); // UCANU, UCANA, UCANE
+                const quantTokensTarget = String(req.body.quantTokensTarget);
+                const quantTokensOffered = String(req.body.quantTokensOffered);
+                const orderType = Number.parseInt(req.body.orderType);
 
-        /*
-        if (offeredTokenName  !== 'UCANU' || offeredTokenName  !== 'UCANA' || offeredTokenName  !== 'UCANE') {
-            res.status(400).json({
+                /*
+                if (offeredTokenName  != 'UCANU' || offeredTokenName  != 'UCANA' || offeredTokenName  != 'UCANE') {
+                    res.status(400).json({
+                        "status": 400,
+                        "message": "Orig Token not defined"
+                    })
+                    return;
+                }
+
+                if (targetTokenName != 'UCANU' || targetTokenName != 'UCANA' || targetTokenName != 'UCANE') {
+                    res.status(400).json({
+                        "status": 400,
+                        "message": "Dest Token not defined"
+                    })
+                    return;
+                }
+*/
+                const idConta = req.body.idConta;
+
+                const detailsOfTransfer = {
+                    from: idConta,
+                    gas: 3000000
+                }
+
+                try {
+                    const returnedValue = await exchangeContract.methods.placeOrder(targetTokenName, quantTokensTarget, offeredTokenName, quantTokensOffered, orderType).send(detailsOfTransfer);
+
+                    if (orderType == 0) {
+                        await updateSellOrdersMappings();
+                    } else {
+                        await updateBuyOrdersMappings();
+                    }
+
+                    if (offeredTokenName == 'UCANA') {
+                        quantTokensUCANATransfered += Number.parseInt(quantTokensOffered);
+                    } else if (offeredTokenName == 'UCANU') {
+                        quantTokensUCANUTransfered += Number.parseInt(quantTokensOffered);
+                    } else {
+                        quantTokensUCANETransfered += Number.parseInt(quantTokensOffered);
+                    }
+                    res.status(200).json({
+                        "message": "Order placed",
+                        "value": returnedValue.events.placeOrderEvent.returnValues.matchResult
+                    })
+
+                    return;
+                } catch (err) {
+                    console.log('err...\n' + err);
+
+                    res.status(200).json({
+                        "message": err
+                    })
+                    return;
+                }
+            }
+        }).catch((error) => {
+            res.status(404).json({
                 "status": 400,
                 "message": "Orig Token not defined"
             })
             return;
-        }
+       }
 
         if (targetTokenName !== 'UCANU' || targetTokenName !== 'UCANA' || targetTokenName !== 'UCANE') {
             res.status(400).json({
@@ -338,11 +392,60 @@ function routes(app, dbUsers, lms, accounts, web3) {
         return;
       }
 
-    }).catch(err => res.status(400).json({
-      status: 200,
-      message: "Account not founded"
-    }))
-  });
+
+    app.get('/getSellOrders/:idConta', (req, res) => {
+        const idConta = req.params.idConta;
+        const privateKey = req.body.privateKey;
+
+        dbUser.findOne({ idConta: idConta }).then(async(data) => {
+            if (data.privateKey == privateKey) {
+                const mySellOrders = [];
+
+                mySellOrders.splice(0, mySellOrders.length);
+                let index = 0;
+                let quantBuyOrders = await exchangeContract.methods.getSellOrdersSize().call({ from: exchangeAddress });
+                let order;
+
+                while (quantBuyOrders) {
+                    order = await exchangeContract.methods.getMySellOrder(index).call({ from: idConta });
+
+                    if (order.id != -1) {
+                        mySellOrders.push({
+                            id: order.id,
+                            owner: order.owner,
+                            targetTokenName: order.targetTokenName,
+                            quantTokensTarget: order.quantTokensTarget,
+                            offeredTokenName: order.offeredTokenName,
+                            quantTokensOffered: order.quantTokensOffered,
+                            isCompleted: order.isCompleted
+                        });
+                    }
+
+
+                    index++;
+                    quantBuyOrders -= 1;
+                }
+
+
+                res.status(200).json({
+                    status: 200,
+                    message: 'My Sell orders Mappings',
+                    sellOrders: mySellOrders,
+                });
+                return;
+            } else {
+                res.status(200).json({
+                    status: 200,
+                    message: 'Not authorized Transaction'
+                });
+                return;
+            }
+
+        }).catch(err => res.status(400).json({
+            status: 200,
+            message: "Account not founded"
+        }))
+    });
 
   app.get('/getSellOrders/:idConta', (req, res) => {
     const idConta = req.params.idConta;

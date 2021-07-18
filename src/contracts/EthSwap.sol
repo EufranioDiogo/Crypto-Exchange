@@ -48,6 +48,13 @@ contract EthSwap
 
 
     function placeOrder(string memory _targetTokenName, uint _quantTokensTarget, string memory _offeredTokenName, uint _quantTokensOffered, uint _orderType) public {
+        if (keccak256(bytes(_offeredTokenName)) == keccak256("UCANA")) {
+            require(ucana.balanceOf(msg.sender) >= _quantTokensOffered * WAD, "Not enough UCANA provided.");
+        } else if (keccak256(bytes(_offeredTokenName)) == keccak256("UCANU")) {
+            require(ucanu.balanceOf(msg.sender) >= _quantTokensOffered * WAD, "Not enough UCANU provided.");
+        } else if (keccak256(bytes(_offeredTokenName)) == keccak256("UCANE")) {
+            require(ucane.balanceOf(msg.sender) >= _quantTokensOffered * WAD, "Not enough UCANE provided.");
+        }
         Order memory newOrder = Order(idOrder, msg.sender, _targetTokenName, _quantTokensTarget, _offeredTokenName, _quantTokensOffered, false);
 
         if (_orderType == 0) {
@@ -62,16 +69,20 @@ contract EthSwap
         emit placeOrderEvent(checkMatches());
     }
 
-    function checkMatches() public returns (bool) {
+    function checkMatches() public payable returns (bool) {
         uint i = 0;
         uint j = 0;
+        bool flagTransferOccured = false;
 
         for (; i < sizeBuyOrders; i++) {
             if (!buyOrders[i].isCompleted) {
                 for (j = 0; j < sizeSellOrders; j++) {
                     if (!sellOrders[j].isCompleted) {
-                        if (keccak256(bytes(buyOrders[i].targetTokenName)) == keccak256(bytes(sellOrders[j].offeredTokenName)) && keccak256(bytes(buyOrders[i].offeredTokenName)) == keccak256(bytes(sellOrders[j].targetTokenName))) {
+                        if (sellOrders[j].owner != buyOrders[i].owner && keccak256(bytes(buyOrders[i].targetTokenName)) == keccak256(bytes(sellOrders[j].offeredTokenName)) && keccak256(bytes(buyOrders[i].offeredTokenName)) == keccak256(bytes(sellOrders[j].targetTokenName))) {
                             if (buyOrders[i].quantTokensOffered >= sellOrders[j].quantTokensTarget && buyOrders[i].quantTokensTarget <= sellOrders[j].quantTokensOffered) {
+                                checkAmountReffered(buyOrders[i].owner, buyOrders[i].quantTokensOffered, buyOrders[i].offeredTokenName);
+                                checkAmountReffered(sellOrders[j].owner, sellOrders[j].quantTokensOffered, sellOrders[i].offeredTokenName);
+
                                 swap(buyOrders[i].owner, sellOrders[j].owner, buyOrders[i].quantTokensOffered, buyOrders[i].offeredTokenName);
 
                                 swap(sellOrders[j].owner, buyOrders[i].owner, sellOrders[j].quantTokensOffered, sellOrders[j].offeredTokenName);
@@ -79,29 +90,33 @@ contract EthSwap
                                 buyOrders[i].isCompleted = true;
                                 sellOrders[j].isCompleted = true;
 
-                                return true;
+                                flagTransferOccured = true;
                             }
                         }
                     }
                 }
             }
         }
-        return false;
+        return flagTransferOccured;
     }
 
     function swap(address _from, address _to, uint256 amount, string memory tokenName) public payable {
         if (keccak256(bytes(tokenName)) == keccak256("UCANA")) {
-            require(ucana.balanceOf(_from) >= amount * WAD, "Not enough01 Ether provided.");
-
             ucana.transferFrom(_from, _to, amount * WAD);
         } else if (keccak256(bytes(tokenName)) == keccak256("UCANU")) {
-            require(ucanu.balanceOf(_from) >= amount * WAD, "Not enough02 Ether provided.");
-
             ucanu.transferFrom(_from, _to, amount * WAD);
         } else if (keccak256(bytes(tokenName)) == keccak256("UCANE")) {
-            require(ucane.balanceOf(_from) >= amount * WAD, "Not enough03 Ether provided.");
-
             ucane.transferFrom(_from, _to, amount * WAD);
+        }
+    }
+
+    function checkAmountReffered(address _from, uint256 amount, string memory tokenName) public{
+        if (keccak256(bytes(tokenName)) == keccak256("UCANA")) {
+            require(ucana.balanceOf(_from) >= amount * WAD, "Not enough UCANA provided.");
+        } else if (keccak256(bytes(tokenName)) == keccak256("UCANU")) {
+            require(ucanu.balanceOf(_from) >= amount * WAD, "Not enough UCANU provided.");
+        } else if (keccak256(bytes(tokenName)) == keccak256("UCANE")) {
+            require(ucane.balanceOf(_from) >= amount * WAD, "Not enough UCANE provided.");
         }
     }
 

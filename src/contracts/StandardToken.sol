@@ -9,10 +9,11 @@ contract StandardToken is ERC20, BasicToken {
 
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
+    require(_from != _to);
 
     balances[_from] -= _value;
     balances[_to] += _value;
-    emit Transfer(_from, _to, _value);
+    //emit Transfer(_from, _to, _value);
     return true;
   }
 

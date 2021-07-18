@@ -71,8 +71,8 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
                 return;
             } else {
-                const offeredTokenName = String(req.body.orig).toUpperCase(); // UCANU, UCANA, UCANE
-                const targetTokenName = String(req.body.dest).toUpperCase(); // UCANU, UCANA, UCANE
+                const offeredTokenName = String(req.body.offeredTokenName).toUpperCase(); // UCANU, UCANA, UCANE
+                const targetTokenName = String(req.body.targetTokenName).toUpperCase(); // UCANU, UCANA, UCANE
                 const quantTokensTarget = String(req.body.quantTokensTarget);
                 const quantTokensOffered = String(req.body.quantTokensOffered);
                 const orderType = Number.parseInt(req.body.orderType);

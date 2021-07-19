@@ -28,16 +28,15 @@ const Dashboard = () => {
   });
 
   const fetchAllStudents = async () => {
-    if (loading) return;
     setLoading(true);
     try {
       const { data } = await api.get("/students");
       setStudents(data || []);
+      setLoading(false);
     } catch (error) {
       toast.error(
         `Ocorreu um erro ao carregar lista de estudantes: ${error.message}`
       );
-    } finally {
       setLoading(false);
     }
   };

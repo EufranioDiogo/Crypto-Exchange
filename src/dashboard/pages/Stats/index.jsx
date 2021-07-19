@@ -8,13 +8,14 @@ import {
   ValueAxis
 } from '@devexpress/dx-react-chart-material-ui';
 import Paper from '@material-ui/core/Paper';
-import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import React, { useCallback, useEffect, useState } from "react";
 
 import api from "../../services/api";
 import { Label, Root } from "./Stats.helpers";
 
 const Stats = () => {
-  const [realTime2, setRealTime2] = useState(new Date());
+  const [realTime, setRealTime] = useState(null);
   const [balancesStats, setBalancesStats] = useState({
     balances: {
       ucana: 0,
@@ -22,45 +23,40 @@ const Stats = () => {
       ucanu: 0,
     },
   });
-  const [transactedAmount, setTransactedAmount] = useState([
-    {
-      x: 0,
-      ucanaTransactedAmount: 0,
-      ucanuTransactedAmount: 0,
-      ucaneTransactedAmount: 0
-    }
-  ]);
+  const [transactedAmount, setTransactedAmount] = useState([]);
 
   const fetchStats = async () => {
     console.log("Actualizou");
     try {
-      const { data } = await api.get("/stats");
+      const { data } = await api.get("/stockExchange");
       setBalancesStats(data || {});
     } catch (error) { }
   };
 
-  const fetchTransactedAmountStats = async () => {
-    console.log("Actualizou AMOUNTS");
+  const fetchTransactedAmountStats = useCallback(async () => {
+    console.log("Actualizou AMOUNTS", realTime);
     try {
       const { data } = await api.get("/exchangeMarketMoviment");
-      console.log(data.exchangeMarketMovement);
-      setTransactedAmount( data.exchangeMarketMovement || [] );
-    } catch (error) { }
-  };
+      setTransactedAmount(data.exchangeMarketMovement || [] );
+    } catch (error) { 
+      toast.error(`Ocorreu um erro ao carregar dados: ${error.message}`);
+    }
+  }, [realTime]);
 
-  /**
   useEffect(() => {
+    if(!realTime)
+    fetchTransactedAmountStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
+  
+  useEffect(() => {
+    // update in 1min
     setTimeout(() => {
       fetchTransactedAmountStats();
       setRealTime(new Date());
-    }, 30000);
-  }, [realTime]);
-   */
-
-  useEffect(() => {
-    fetchTransactedAmountStats();
-  }, []);
-
+    }, 10000);
+  }, [fetchTransactedAmountStats, realTime]);
+    
   return (
     <>
       <Paper>
@@ -86,13 +82,13 @@ const Stats = () => {
             argumentField="x"
             color="#10ac84"
           />
-          <Animation />
+          {transactedAmount && transactedAmount.length && <Animation />}
+
           <Legend position="bottom" rootComponent={Root} labelComponent={Label} />
           <Title text="Moedas Transacionadas por segundos" />
           <Stack />
         </Chart>
       </Paper>
-      {/**
       <div className="container p-5" style={{ maxWidth: "700px" }}>
         <div className="card shadow-sm p-5 text-center">
           <p className="h5 mb-3 text-center font-weight-bold">PATRIMÓNIO TOTAL</p>
@@ -108,13 +104,13 @@ const Stats = () => {
             <tbody>
               <tr>
                 <td className="h4 font-weight-bold">
-                  {balancesStats.balances.ucana.price || 0}
+                  {balancesStats.balances.ucana || 0}
                 </td>
                 <td className="h4 font-weight-bold">
-                  {balancesStats.balances.ucane.price || 0}
+                  {balancesStats.balances.ucane || 0}
                 </td>
                 <td className="h4 font-weight-bold">
-                  {balancesStats.balances.ucanu.price || 0}
+                  {balancesStats.balances.ucanu || 0}
                 </td>
               </tr>
             </tbody>
@@ -125,7 +121,6 @@ const Stats = () => {
           </p>
         </div>
       </div>
-     */}
     </>
   );
 };

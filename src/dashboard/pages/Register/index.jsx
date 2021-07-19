@@ -27,7 +27,7 @@ const Exchange = () => {
     if (submting) return;
     try {
       setSubmting(true);
-      await api.post("/register");
+      await api.post("/register", formValues);
       toast.success("Estudante cadastrado com sucesso!");
       route.push("/dashboard");
     } catch (error) {
@@ -68,7 +68,7 @@ const Exchange = () => {
             variant="filled"
             value={formValues.idEstudante}
             onChange={(value) =>
-              setFormValue((prev) => ({ ...prev, idEstudante: value }))
+              setFormValue((prev) => ({ ...prev, idEstudante: value.target.value }))
             }
           />
         </Box>
@@ -81,7 +81,7 @@ const Exchange = () => {
             variant="filled"
             value={formValues.nome}
             onChange={(value) =>
-              setFormValue((prev) => ({ ...prev, nome: value }))
+              setFormValue((prev) => ({ ...prev, nome: value.target.value }))
             }
           />
         </Box>
@@ -94,7 +94,7 @@ const Exchange = () => {
             variant="filled"
             value={formValues.sobrenome}
             onChange={(value) =>
-              setFormValue((prev) => ({ ...prev, sobrenome: value }))
+              setFormValue((prev) => ({ ...prev, sobrenome: value.target.value }))
             }
           />
         </Box>
@@ -107,7 +107,7 @@ const Exchange = () => {
             variant="filled"
             value={formValues.idConta}
             onChange={(value) =>
-              setFormValue((prev) => ({ ...prev, idConta: value }))
+              setFormValue((prev) => ({ ...prev, idConta: value.target.value }))
             }
           />
         </Box>
@@ -120,18 +120,20 @@ const Exchange = () => {
             variant="filled"
             value={formValues.privateKey}
             onChange={(value) =>
-              setFormValue((prev) => ({ ...prev, privateKey: value }))
+              setFormValue((prev) => ({ ...prev, privateKey: value.target.value }))
             }
           />
         </Box>
-        <Button
-          fullWidth
-          color="secondary"
-          variant="contained"
-          onClick={handleSubmit}
-        >
-          {submting ? <CircularProgress size="small" /> : "Submeter Dados"}
-        </Button>
+        {submting ? <CircularProgress  size="small" />  :
+          <Button
+            fullWidth
+            color="secondary"
+            variant="contained"
+            onClick={handleSubmit}
+          >
+          Submeter Dados 
+          </Button>
+        }
       </Box>
     </Box>
   );

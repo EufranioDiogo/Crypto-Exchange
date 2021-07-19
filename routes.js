@@ -405,8 +405,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
       const totalUCANA = await exchangeContract.methods.getTotalValorNaBolsaUCANA().call();
       const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
       const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
-
-      res.status(200).json({
+      return res.status(200).json({
         status: 200,
         message: 'Balances of Exchange',
         balances: {
@@ -415,24 +414,20 @@ function routes(app, dbUsers, lms, accounts, web3) {
           ucane: totalUCANE
         }
       });
-      return;
-    }).catch((error) => {
+    }).catch((error) =>
       res.status(500).json({
         status: 500,
         message: error
       })
-      return;
-    })
+    )
   })
 
   app.get('/students', async (req, res) => {
     try {
       const data = await dbUser.find({}).toArray();
-      console.log(data)
-      res.status(200).send(data);
+      return res.status(200).send(data);
     } catch (error) {
-      console.log(error)
-      res.status(500).json({
+      return res.status(500).json({
         status: 500,
         message: error
       })
@@ -498,6 +493,9 @@ module.exports = routes;
 function exchangeMarketMovementFunction() {
   exchangeMarketTimeStamp += timeStampToUpdateExchangeMarketMovimento;
 
+  if (exchangeMarketMovement.length > 30)
+    exchangeMarketMovement.shift()
+    
   exchangeMarketMovement.push({
     x: exchangeMarketTimeStamp,
     'ucanaTransactedAmount': quantTokensUCANATransfered,

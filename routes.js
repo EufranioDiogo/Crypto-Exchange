@@ -502,5 +502,3 @@ function exchangeMarketMovementFunction() {
     quantTokensUCANUTransfered = 0;
     quantTokensUCANETransfered = 0;
 }
-quantTokensUCANETransfered = 0;
-}

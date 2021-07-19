@@ -12,7 +12,6 @@ const getCircularReplacer = () => {
 };
 const { timeStamp } = require('console');
 const fs = require('fs');
-const { restart } = require('nodemon');
 let requestExchangeBuyOrdersRunning = false;
 //const { RESERVED_EVENTS } = require('socket.io/dist/socket');
 const buyOrdersMappings = [];
@@ -102,11 +101,15 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
                 try {
                     const returnedValue = await exchangeContract.methods.placeOrder(targetTokenName, quantTokensTarget, offeredTokenName, quantTokensOffered, orderType).send(detailsOfTransfer);
+                    let orders;
 
                     if (orderType === 0) {
                         await updateSellOrdersMappings();
+                        orders = await getMySellOrders(idConta);
+
                     } else {
                         await updateBuyOrdersMappings();
+                        orders = await getMyBuyOrders(idConta);
                     }
 
                     if (offeredTokenName === 'UCANA') {
@@ -118,7 +121,8 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     }
                     res.status(200).json({
                         "message": "Order placed",
-                        "value": returnedValue.events.placeOrderEvent.returnValues.matchResult
+                        "value": returnedValue.events.placeOrderEvent.returnValues.matchResult,
+                        "orders": orders,
                     })
 
                     return;
@@ -297,30 +301,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
         dbUser.findOne({ idConta: idConta }).then(async(data) => {
             if (data.privateKey === privateKey) {
-                const myBuyOrders = [];
-
-                myBuyOrders.splice(0, myBuyOrders.length);
-                let index = 0;
-                let quantBuyOrders = await exchangeContract.methods.getBuyOrdersSize().call({ from: exchangeAddress });
-                let order;
-
-                while (quantBuyOrders) {
-                    order = await exchangeContract.methods.getMyBuyOrder(index).call({ from: idConta });
-                    if (order.id !== -1) {
-                        myBuyOrders.push({
-                            id: order.id,
-                            owner: order.owner,
-                            targetTokenName: order.targetTokenName,
-                            quantTokensTarget: order.quantTokensTarget,
-                            offeredTokenName: order.offeredTokenName,
-                            quantTokensOffered: order.quantTokensOffered,
-                            isCompleted: order.isCompleted
-                        });
-                    }
-
-                    index++;
-                    quantBuyOrders -= 1;
-                }
+                const myBuyOrders = await getMyBuyOrders(idConta);
 
 
                 res.status(200).json({
@@ -349,32 +330,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
         dbUser.findOne({ idConta: idConta }).then(async(data) => {
             if (data.privateKey === privateKey) {
-                const mySellOrders = [];
-
-                mySellOrders.splice(0, mySellOrders.length);
-                let index = 0;
-                let quantBuyOrders = await exchangeContract.methods.getSellOrdersSize().call({ from: exchangeAddress });
-                let order;
-
-                while (quantBuyOrders) {
-                    order = await exchangeContract.methods.getMySellOrder(index).call({ from: idConta });
-
-                    if (order.id !== -1) {
-                        mySellOrders.push({
-                            id: order.id,
-                            owner: order.owner,
-                            targetTokenName: order.targetTokenName,
-                            quantTokensTarget: order.quantTokensTarget,
-                            offeredTokenName: order.offeredTokenName,
-                            quantTokensOffered: order.quantTokensOffered,
-                            isCompleted: order.isCompleted
-                        });
-                    }
-
-
-                    index++;
-                    quantBuyOrders -= 1;
-                }
+                const mySellOrders = await getMySellOrders();
 
 
                 res.status(200).json({
@@ -425,6 +381,23 @@ function routes(app, dbUsers, lms, accounts, web3) {
     app.get('/students', async(req, res) => {
         try {
             const data = await dbUser.find({}).toArray();
+
+            for (let i = 0; i < data.length; i++) {
+                const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({
+                    from: data[i].idConta
+                });
+                const balanceToken2 = await exchangeContract.methods.getBalanceOfToken2().call({
+                    from: data[i].idConta
+                });
+                const balanceToken3 = await exchangeContract.methods.getBalanceOfToken3().call({
+                    from: data[i].idConta
+                });
+                data[i].ucana = balanceToken1;
+                data[i].ucanu = balanceToken2;
+                data[i].ucane = balanceToken3;
+            }
+
+
             return res.status(200).send(data);
         } catch (error) {
             return res.status(500).json({
@@ -440,6 +413,65 @@ function routes(app, dbUsers, lms, accounts, web3) {
         });
     })
 
+
+    async function getMySellOrders(accountID) {
+        const mySellOrders = [];
+
+        mySellOrders.splice(0, mySellOrders.length);
+        let index = 0;
+        let quantSellOrders = await exchangeContract.methods.getSellOrdersSize().call({ from: exchangeAddress });
+        let order;
+
+        while (quantSellOrders != 0) {
+            order = await exchangeContract.methods.getMySellOrder(index).call({ from: accountID });
+
+            if (order.id != -1) {
+                mySellOrders.push({
+                    id: order.id,
+                    owner: order.owner,
+                    targetTokenName: order.targetTokenName,
+                    quantTokensTarget: order.quantTokensTarget,
+                    offeredTokenName: order.offeredTokenName,
+                    quantTokensOffered: order.quantTokensOffered,
+                    isCompleted: order.isCompleted
+                });
+            }
+
+
+            index++;
+            quantSellOrders -= 1;
+        }
+        return mySellOrders;
+    }
+
+    async function getMyBuyOrders(accountID) {
+        const myBuyOrders = [];
+
+        myBuyOrders.splice(0, myBuyOrders.length);
+        let index = 0;
+        let quantBuyOrders = await exchangeContract.methods.getBuyOrdersSize().call({ from: exchangeAddress });
+        let order;
+
+        while (quantBuyOrders != 0) {
+            order = await exchangeContract.methods.getMyBuyOrder(index).call({ from: accountID });
+
+            if (order.id != -1) {
+                myBuyOrders.push({
+                    id: order.id,
+                    owner: order.owner,
+                    targetTokenName: order.targetTokenName,
+                    quantTokensTarget: order.quantTokensTarget,
+                    offeredTokenName: order.offeredTokenName,
+                    quantTokensOffered: order.quantTokensOffered,
+                    isCompleted: order.isCompleted
+                });
+            }
+
+            index++;
+            quantBuyOrders -= 1;
+        }
+        return myBuyOrders;
+    }
 
     async function updateSellOrdersMappings() {
         sellOrdersMappings.splice(0, sellOrdersMappings.length);

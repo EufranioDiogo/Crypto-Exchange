@@ -27,7 +27,6 @@ const exchangeMarketMovement = [];
 
 setInterval(exchangeMarketMovementFunction, timeStampToUpdateExchangeMarketMovimento);
 
-
 function routes(app, dbUsers, lms, accounts, web3) {
     const dbUser = dbUsers.collection('exchange-users');
     const exchange = dbUsers.collection('exchange-store')
@@ -63,7 +62,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         dbUser.findOne({ idEstudante: idEstudante }).then(async(data) => {
             const privateKey = req.body.privateKey;
 
-            if (privateKey != data.privateKey) {
+            if (privateKey !== data.privateKey) {
                 res.status(404).json({
                     "status": "error, not authorized",
                     "message": "error not valid private key"
@@ -78,21 +77,21 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 const orderType = Number.parseInt(req.body.orderType);
 
                 /*
-                if (offeredTokenName  != 'UCANU' || offeredTokenName  != 'UCANA' || offeredTokenName  != 'UCANE') {
-                    res.status(400).json({
-                        "status": 400,
-                        "message": "Orig Token not defined"
-                    })
-                    return;
-                }
+        if (offeredTokenName  !== 'UCANU' || offeredTokenName  !== 'UCANA' || offeredTokenName  !== 'UCANE') {
+            res.status(400).json({
+                "status": 400,
+                "message": "Orig Token not defined"
+            })
+            return;
+        }
 
-                if (targetTokenName != 'UCANU' || targetTokenName != 'UCANA' || targetTokenName != 'UCANE') {
-                    res.status(400).json({
-                        "status": 400,
-                        "message": "Dest Token not defined"
-                    })
-                    return;
-                }
+        if (targetTokenName !== 'UCANU' || targetTokenName !== 'UCANA' || targetTokenName !== 'UCANE') {
+            res.status(400).json({
+                "status": 400,
+                "message": "Dest Token not defined"
+            })
+            return;
+        }
 */
                 const idConta = req.body.idConta;
 
@@ -104,15 +103,15 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 try {
                     const returnedValue = await exchangeContract.methods.placeOrder(targetTokenName, quantTokensTarget, offeredTokenName, quantTokensOffered, orderType).send(detailsOfTransfer);
 
-                    if (orderType == 0) {
+                    if (orderType === 0) {
                         await updateSellOrdersMappings();
                     } else {
                         await updateBuyOrdersMappings();
                     }
 
-                    if (offeredTokenName == 'UCANA') {
+                    if (offeredTokenName === 'UCANA') {
                         quantTokensUCANATransfered += Number.parseInt(quantTokensOffered);
-                    } else if (offeredTokenName == 'UCANU') {
+                    } else if (offeredTokenName === 'UCANU') {
                         quantTokensUCANUTransfered += Number.parseInt(quantTokensOffered);
                     } else {
                         quantTokensUCANETransfered += Number.parseInt(quantTokensOffered);
@@ -191,7 +190,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         if (idEstudante && nome && sobrenome && idConta && privateKey) {
             dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey })
                 .then(data => {
-                    if (data != null) {
+                    if (data !== null) {
                         res.status(400).json({
                             "status": 400,
                             "message": "User already exist"
@@ -297,7 +296,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         const privateKey = req.body.privateKey;
 
         dbUser.findOne({ idConta: idConta }).then(async(data) => {
-            if (data.privateKey == privateKey) {
+            if (data.privateKey === privateKey) {
                 const myBuyOrders = [];
 
                 myBuyOrders.splice(0, myBuyOrders.length);
@@ -307,7 +306,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
 
                 while (quantBuyOrders) {
                     order = await exchangeContract.methods.getMyBuyOrder(index).call({ from: idConta });
-                    if (order.id != -1) {
+                    if (order.id !== -1) {
                         myBuyOrders.push({
                             id: order.id,
                             owner: order.owner,
@@ -349,7 +348,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
         const privateKey = req.body.privateKey;
 
         dbUser.findOne({ idConta: idConta }).then(async(data) => {
-            if (data.privateKey == privateKey) {
+            if (data.privateKey === privateKey) {
                 const mySellOrders = [];
 
                 mySellOrders.splice(0, mySellOrders.length);
@@ -360,7 +359,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 while (quantBuyOrders) {
                     order = await exchangeContract.methods.getMySellOrder(index).call({ from: idConta });
 
-                    if (order.id != -1) {
+                    if (order.id !== -1) {
                         mySellOrders.push({
                             id: order.id,
                             owner: order.owner,
@@ -406,8 +405,7 @@ function routes(app, dbUsers, lms, accounts, web3) {
             const totalUCANA = await exchangeContract.methods.getTotalValorNaBolsaUCANA().call();
             const totalUCANU = await exchangeContract.methods.getTotalValorNaBolsaUCANU().call();
             const totalUCANE = await exchangeContract.methods.getTotalValorNaBolsaUCANE().call();
-
-            res.status(200).json({
+            return res.status(200).json({
                 status: 200,
                 message: 'Balances of Exchange',
                 balances: {
@@ -416,20 +414,24 @@ function routes(app, dbUsers, lms, accounts, web3) {
                     ucane: totalUCANE
                 }
             });
-            return;
-        }).catch((error) => {
+        }).catch((error) =>
             res.status(500).json({
                 status: 500,
                 message: error
             })
-            return;
-        })
+        )
     })
 
     app.get('/students', async(req, res) => {
-        const data = await dbUsers.collection('exchange-users').findAll();
-
-        return res.status(200).send(data);
+        try {
+            const data = await dbUser.find({}).toArray();
+            return res.status(200).send(data);
+        } catch (error) {
+            return res.status(500).json({
+                status: 500,
+                message: error
+            })
+        }
     })
 
     app.get('/exchangeMarketMoviment', async(req, res) => {
@@ -490,6 +492,9 @@ module.exports = routes;
 
 function exchangeMarketMovementFunction() {
     exchangeMarketTimeStamp += timeStampToUpdateExchangeMarketMovimento;
+
+    if (exchangeMarketMovement.length > 30)
+        exchangeMarketMovement.shift()
 
     exchangeMarketMovement.push({
         x: exchangeMarketTimeStamp,

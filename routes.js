@@ -20,7 +20,10 @@ let quantTokensUCANATransfered = 0;
 let quantTokensUCANUTransfered = 0;
 let quantTokensUCANETransfered = 0;
 let exchangeMarketTimeStamp = 0;
-let timeStampToUpdateExchangeMarketMovimento = 20;
+let timeStampToUpdateExchangeMarketMovimento = 2000;
+let accounts = null;
+let actualAccountToBeSended = 0;
+
 
 const exchangeMarketMovement = [];
 
@@ -28,7 +31,9 @@ setInterval(exchangeMarketMovementFunction, timeStampToUpdateExchangeMarketMovim
 
 function routes(app, dbUsers, lms, accounts, web3) {
     const dbUser = dbUsers.collection('exchange-users');
+    const dbAccounts = dbUsers.collection('accounts-data')
     const exchange = dbUsers.collection('exchange-store')
+    accounts = accounts;
     const exchangeAddress = lms.address;
     // @ts-ignore
     const exchangeContractJSON = JSON.parse(fs.readFileSync('./src/abis/EthSwap.json'), 'utf8');
@@ -76,22 +81,22 @@ function routes(app, dbUsers, lms, accounts, web3) {
                 const orderType = Number.parseInt(req.body.orderType);
 
                 /*
-        if (offeredTokenName  !== 'UCANU' || offeredTokenName  !== 'UCANA' || offeredTokenName  !== 'UCANE') {
-            res.status(400).json({
-                "status": 400,
-                "message": "Orig Token not defined"
-            })
-            return;
-        }
+                if (offeredTokenName  !== 'UCANU' || offeredTokenName  !== 'UCANA' || offeredTokenName  !== 'UCANE') {
+                    res.status(400).json({
+                        "status": 400,
+                        "message": "Orig Token not defined"
+                    })
+                    return;
+                }
 
-        if (targetTokenName !== 'UCANU' || targetTokenName !== 'UCANA' || targetTokenName !== 'UCANE') {
-            res.status(400).json({
-                "status": 400,
-                "message": "Dest Token not defined"
-            })
-            return;
-        }
-*/
+                if (targetTokenName !== 'UCANU' || targetTokenName !== 'UCANA' || targetTokenName !== 'UCANE') {
+                    res.status(400).json({
+                        "status": 400,
+                        "message": "Dest Token not defined"
+                    })
+                    return;
+                }*/
+
                 const idConta = req.body.idConta;
 
                 const detailsOfTransfer = {
@@ -176,23 +181,23 @@ function routes(app, dbUsers, lms, accounts, web3) {
         })
     })
 
-    app.post('/register', (req, res) => {
+    app.post('/register', async(req, res) => {
         const idEstudante = req.body.idEstudante;
         const nome = req.body.nome;
         const sobrenome = req.body.sobrenome;
-        const idConta = req.body.idConta;
-        const privateKey = req.body.privateKey;
+
+        const accountInfo = await getLastValidAccountAvaible();
 
         const user = {
             idEstudante,
             nome,
             sobrenome,
-            idConta,
-            privateKey
+            idConta: accountInfo.accountID,
+            privateKey: accountInfo.privateKey
         }
 
-        if (idEstudante && nome && sobrenome && idConta && privateKey) {
-            dbUser.findOne({ idEstudante, nome, sobrenome, idConta, privateKey })
+        if (idEstudante && nome && sobrenome) {
+            dbUser.findOne({ idEstudante, nome, sobrenome })
                 .then(data => {
                     if (data !== null) {
                         res.status(400).json({
@@ -216,6 +221,35 @@ function routes(app, dbUsers, lms, accounts, web3) {
         } else {
             res.status(400).json({ "status": "Failed", "reason": "wrong input" })
         }
+    })
+
+
+    app.post('/accounts', (req, res) => {
+        /*const idEstudante = req.body.idEstudante;
+        const nome = req.body.nome;
+        const sobrenome = req.body.sobrenome;
+        const idConta = req.body.idConta;
+        const privateKey = req.body.privateKey;
+
+        if (privateKeys.length == accounts.length) {
+            for (let i = 0; i < accounts.length; i++) {
+                dbAccounts.insertOne({
+                    accountID: accounts[i],
+                    privateKey: privateKeys[i],
+                    used: false
+                });
+            }
+        } else {
+            console.log("Not equal");
+        }
+
+
+        res.status(200).json({
+            "status": 200,
+        })*/
+        res.status(200).json({
+            "status": 200,
+        })
     })
 
     app.get('/exchange', (req, res) => {
@@ -251,7 +285,6 @@ function routes(app, dbUsers, lms, accounts, web3) {
             res.status(200).json({
                 status: 200,
                 message: 'Balances of Exchange',
-                pivoName: pivoName,
                 balances: {
                     ucana: {
                         ucane: tokenAtoE,
@@ -518,6 +551,23 @@ function routes(app, dbUsers, lms, accounts, web3) {
             quantBuyOrders -= 1;
         }
     }
+
+    async function getLastValidAccountAvaible() {
+        const accounts = await dbAccounts.find({}).toArray();
+        let i = 0;
+
+        while (i < accounts.length) {
+            if (accounts[i].used == false) {
+                dbAccounts.update({ accountID: accounts[i].accountID }, {
+                    accountID: accounts[i].accountID,
+                    privateKey: accounts[i].privateKey,
+                    used: true
+                })
+                return accounts[i];
+            }
+            i++;
+        }
+    }
 }
 
 module.exports = routes;
@@ -534,6 +584,8 @@ function exchangeMarketMovementFunction() {
         'ucanuTransactedAmount': quantTokensUCANUTransfered,
         'ucaneTransactedAmount': quantTokensUCANETransfered,
     })
+
+
 
     quantTokensUCANATransfered = 0;
     quantTokensUCANUTransfered = 0;

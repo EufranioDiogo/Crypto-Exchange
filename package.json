@@ -12,12 +12,12 @@
         "runBack": "node server.js"
     },
     "dependencies": {
+        "@devexpress/dx-react-chart": "2.7.6",
+        "@devexpress/dx-react-chart-material-ui": "2.7.6",
+        "@devexpress/dx-react-core": "2.7.6",
         "@material-ui/core": "^4.11.4",
         "@material-ui/icons": "^4.11.2",
         "@truffle/contract": "^4.3.21",
-        "@devexpress/dx-react-core": "2.7.6",
-        "@devexpress/dx-react-chart-material-ui": "2.7.6",
-        "@devexpress/dx-react-chart": "2.7.6",
         "axios": "^0.21.1",
         "babel-polyfill": "6.26.0",
         "babel-preset-env": "1.7.0",
@@ -25,6 +25,7 @@
         "babel-preset-stage-2": "^6.22.0",
         "babel-preset-stage-3": "^6.22.0",
         "babel-register": "6.26.0",
+        "base32": "^0.0.6",
         "bootstrap": "4.3.1",
         "chai": "4.2.0",
         "chai-as-promised": "7.1.1",

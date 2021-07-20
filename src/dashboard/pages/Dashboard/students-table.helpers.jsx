@@ -46,11 +46,13 @@ export const StudentsTableOptions = {
 
 const CustomLabel = ({ children }) => ( <
     p style = {
-        { fontSize: 16, fontWeight: "bold" } } > { children } <
+        { fontSize: 16, fontWeight: "bold" }
+    } > { children } <
     /p>
 );
 const CustomBody = ({ children }) => < p style = {
-    { fontSize: 16 } } > { children } < /p>;
+    { fontSize: 16 }
+} > { children } < /p>;
 
 export const StudentsTableColumns = [{
         name: "idEstudante",

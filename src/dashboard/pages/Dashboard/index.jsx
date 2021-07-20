@@ -10,109 +10,147 @@ import { useHistory } from "react-router-dom";
 
 import api from "../../services/api";
 import {
-  StudentsTableColumns,
-  StudentsTableOptions,
+    StudentsTableColumns,
+    StudentsTableOptions,
 } from "./students-table.helpers";
 // import studentsData from "../../../data/students.data.json"
 
 const Dashboard = () => {
-  const { push } = useHistory();
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [exchangeBalance, setExchangeBalance] = useState({
-    balances: {
-      ucana: 0.0,
-      ucane: 0.0,
-      ucanu: 0.0,
-    },
-  });
+    const { push } = useHistory();
+    const [realTime, setRealTime] = useState(null);
 
-  const fetchAllStudents = async () => {
-    setLoading(true);
-    try {
-      const { data } = await api.get("/students");
-      setStudents(data || []);
-      setLoading(false);
-    } catch (error) {
-      toast.error(
-        `Ocorreu um erro ao carregar lista de estudantes: ${error.message}`
-      );
-      setLoading(false);
-    }
-  };
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [exchangeBalance, setExchangeBalance] = useState({
+        balances: {
+            ucana: 0.0,
+            ucane: 0.0,
+            ucanu: 0.0,
+        },
+    });
 
-  const getExchangeBalance = async () => {
-    try {
-      const { data } = await api.get("/stockExchange");
-      setExchangeBalance(data || {});
-    } catch (error) {
-      toast.error(`Ocorreu um erro ao carregar dados: ${error.message}`);
-    }
-  };
+    const fetchAllStudents = async() => {
+        setLoading(true);
+        try {
+            const { data } = await api.get("/students");
+            setStudents(data || []);
+            setLoading(false);
+        } catch (error) {
+            toast.error(
+                `Ocorreu um erro ao carregar lista de estudantes: ${error.message}`
+            );
+            setLoading(false);
+        }
+    };
 
-  useEffect(() => {
-    fetchAllStudents();
-    getExchangeBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const getExchangeBalance = async() => {
+        try {
+            const { data } = await api.get("/stockExchange");
+            setExchangeBalance(data || {});
+        } catch (error) {
+            toast.error(`Ocorreu um erro ao carregar dados: ${error.message}`);
+        }
+    };
 
-  return (
-    <Paper elevation={2} className="p-4">
-      <div className="d-flex justify-content-between">
-        <IconButton onClick={fetchAllStudents} >
-          <UpdateIcon />
-        </IconButton>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => push("/register")}
-          className="font-weight-bold"
-        >
-          Novo Estudante
-        </Button>
-      </div>
-      {loading ?
-        <Box className="p-5 m-5 d-flex justify-content-center align-items-center">
-          <CircularProgress />
-        </Box>
-        :
-        <MUIDataTable
-          title="Lista de Estudantes"
-          data={students}
-          columns={StudentsTableColumns}
-          options={StudentsTableOptions}
-        />
-      }
-      <Paper elevation={3} className="p-4">
-        <Box mt={4} mb={3} textAlign="center">
-          <Typography variant="h5" color="primary">
-            TOTAIS DE CADA MOEDA
-          </Typography>
-        </Box>
+    useEffect(() => {
+        if (!realTime) {
+            fetchAllStudents();
+            getExchangeBalance();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-        <Box display="flex">
-          <Typography variant="h6">TOTAL DE UCANA: </Typography>
-          <Typography className="ml-2" variant="h6" color="secondary">
-            {`  ${exchangeBalance.balances.ucana || 0.0}`}
-          </Typography>
-        </Box>
+    useEffect(() => {
+        setTimeout(() => {
+            if (realTime) {
+                fetchAllStudents();
+                getExchangeBalance();
+            }
+            setRealTime(new Date());
+        }, 60000);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [realTime]);
 
-        <Box my={3} display="flex">
-          <Typography variant="h6">TOTAL DE UCANE: </Typography>
-          <Typography className="ml-2" variant="h6" color="secondary">
-            {`  ${exchangeBalance.balances.ucane || 0.0}`}
-          </Typography>
-        </Box>
+    return ( <
+        Paper elevation = { 2 }
+        className = "p-4" >
+        <
+        div className = "d-flex justify-content-between" >
+        <
+        IconButton onClick = { fetchAllStudents } >
+        <
+        UpdateIcon / >
+        <
+        /IconButton> <
+        Button variant = "contained"
+        color = "primary"
+        onClick = {
+            () => push("/register")
+        }
+        className = "font-weight-bold" >
+        Novo Estudante <
+        /Button> < /
+        div > {
+            loading ?
+            <
+            Box className = "p-5 m-5 d-flex justify-content-center align-items-center" >
+            <
+            CircularProgress / >
+            <
+            /Box> : <
+            MUIDataTable
+            title = "Lista de Estudantes"
+            data = { students }
+            columns = { StudentsTableColumns }
+            options = { StudentsTableOptions }
+            />
+        } <
+        Paper elevation = { 3 }
+        className = "p-4" >
+        <
+        Box mt = { 4 }
+        mb = { 3 }
+        textAlign = "center" >
+        <
+        Typography variant = "h5"
+        color = "primary" >
+        TOTAIS DE CADA MOEDA <
+        /Typography> < /
+        Box >
 
-        <Box display="flex">
-          <Typography variant="h6">TOTAL DE UCANU: </Typography>
-          <Typography className="ml-2" variant="h6" color="secondary">
-            {`  ${exchangeBalance.balances.ucanu || 0.0}`}
-          </Typography>
-        </Box>
-      </Paper>
-    </Paper>
-  );
+        <
+        Box display = "flex" >
+        <
+        Typography variant = "h6" > TOTAL DE UCANA: < /Typography> <
+        Typography className = "ml-2"
+        variant = "h6"
+        color = "secondary" > { `  ${exchangeBalance.balances.ucana || 0.0}` } <
+        /Typography> < /
+        Box >
+
+        <
+        Box my = { 3 }
+        display = "flex" >
+        <
+        Typography variant = "h6" > TOTAL DE UCANE: < /Typography> <
+        Typography className = "ml-2"
+        variant = "h6"
+        color = "secondary" > { `  ${exchangeBalance.balances.ucane || 0.0}` } <
+        /Typography> < /
+        Box >
+
+        <
+        Box display = "flex" >
+        <
+        Typography variant = "h6" > TOTAL DE UCANU: < /Typography> <
+        Typography className = "ml-2"
+        variant = "h6"
+        color = "secondary" > { `  ${exchangeBalance.balances.ucanu || 0.0}` } <
+        /Typography> < /
+        Box > <
+        /Paper> < /
+        Paper >
+    );
 };
 
 export default Dashboard;

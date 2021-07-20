@@ -1,15 +1,17 @@
 require('dotenv').config();
 const PORT = 3001;
-//const IP = '192.168.0.29';
-const IP = '127.0.0.1'
+const IP = '192.168.0.1';
+//const IP = '127.0.0.1'
 const express = require('express')
 const app = express()
 const routes = require('./routes')
 const Web3 = require('web3');
+const base32 = require('base32');
 const mongodb = require('mongodb').MongoClient;
 const contract = require('truffle-contract');
 const artifacts = require('./src/abis/EthSwap.json');
 const cors = require('cors');
+const { WbIridescentTwoTone } = require('@material-ui/icons');
 
 let web3;
 app.use(express.json());
@@ -29,6 +31,9 @@ LMS.setProvider(web3.currentProvider)
 mongodb.connect('mongodb://localhost:27017/exchange_api_database', { useUnifiedTopology: true }, async(err, client) => {
     const db = client.db('exchange_api_database');
     const accounts = await web3.eth.getAccounts();
+
+
+
     const lms = await LMS.deployed();
 
     //console.log(accounts);

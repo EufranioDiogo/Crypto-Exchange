@@ -18,7 +18,6 @@ contract EthSwap
     uint rangeLimit = 10;
     address public owner;
     string public pivoName = "";
-    bool isFirstOrderPlaced = true;
 
     struct Order {
         uint id;
@@ -50,16 +49,10 @@ contract EthSwap
     function placeOrder(string memory _targetTokenName, uint _quantTokensTarget, string memory _offeredTokenName, uint _quantTokensOffered, uint _orderType) public {
         if (keccak256(bytes(_offeredTokenName)) == keccak256("UCANA")) {
             require(ucana.balanceOf(msg.sender) >= _quantTokensOffered, "Not enough UCANA provided.");
-
-            
         } else if (keccak256(bytes(_offeredTokenName)) == keccak256("UCANU")) {
             require(ucanu.balanceOf(msg.sender) >= _quantTokensOffered, "Not enough UCANU provided.");
-
-
         } else if (keccak256(bytes(_offeredTokenName)) == keccak256("UCANE")) {
             require(ucane.balanceOf(msg.sender) >= _quantTokensOffered, "Not enough UCANE provided.");
-
-            
         }
         Order memory newOrder = Order(idOrder, msg.sender, _targetTokenName, _quantTokensTarget, _offeredTokenName, _quantTokensOffered, false);
 
@@ -111,7 +104,7 @@ contract EthSwap
             ucana.transferFrom(_from, _to, amount);
         } else if (keccak256(bytes(tokenName)) == keccak256("UCANU")) {
             ucanu.transferFrom(_from, _to, amount);
-        } else if (keccak256(bytes(tokenName)) == keccak256("UCANE")) {
+        } else {
             ucane.transferFrom(_from, _to, amount);
         }
     }
@@ -121,13 +114,9 @@ contract EthSwap
             require(ucana.balanceOf(_from) >= amount, "Not enough UCANA provided.");
         } else if (keccak256(bytes(tokenName)) == keccak256("UCANU")) {
             require(ucanu.balanceOf(_from) >= amount, "Not enough UCANU provided.");
-        } else if (keccak256(bytes(tokenName)) == keccak256("UCANE")) {
+        } else {
             require(ucane.balanceOf(_from) >= amount, "Not enough UCANE provided.");
         }
-    }
-
-    function getIdPivo() public returns (string memory) {
-        return pivoName;
     }
 
     function random(uint mod) internal returns (uint) {
@@ -146,6 +135,13 @@ contract EthSwap
         return ucane.balanceOfToken(msg.sender);
     }
 
+    function getBalanceInfo() public returns (uint256, uint256, uint256, uint256) {
+        uint ucanuAmount = ucanu.balanceOfToken(msg.sender);
+        uint ucanaAmount = ucana.balanceOfToken(msg.sender);
+        uint ucaneAmount = ucane.balanceOfToken(msg.sender);
+
+        return (getPatrimonio(ucanuAmount, ucanaAmount, ucaneAmount), ucanuAmount, ucanaAmount, ucaneAmount);
+    }
 
     function getRelationOfToken1() public returns (uint256, uint256) {
         return (ucana.getUmToken1EquivaleQuantosToken2(), ucana.getUmToken1EquivaleQuantosToken3());
@@ -158,6 +154,17 @@ contract EthSwap
     function getRelationOfToken3() public returns (uint256, uint256) {
         return (ucane.getUmToken3EquivaleQuantosToken1(), ucane.getUmToken3EquivaleQuantosToken2());
     }
+
+    function getPatrimonio(uint _ucanu, uint _ucana, uint _ucane) public returns (uint) {
+        if (keccak256(bytes(pivoName)) == keccak256("UCANA")) {
+            return _ucana + (((1 * WAD) * _ucanu) / ucana.getUmToken1EquivaleQuantosToken2()) + (_ucane) / ucana.getUmToken1EquivaleQuantosToken3();
+        } else if (keccak256(bytes(pivoName)) == keccak256("UCANU")) {
+            return _ucanu + (((1 * WAD) * _ucana) / ucanu.getUmToken2EquivaleQuantosToken1()) + ((_ucane) / ucanu.getUmToken2EquivaleQuantosToken3());
+        } else {
+            return _ucane + (((1 * WAD) * _ucana) / ucane.getUmToken3EquivaleQuantosToken1()) + ((_ucanu) / ucane.getUmToken3EquivaleQuantosToken2());
+        }
+    }
+
 
     function sortInitialPivo() public {
         int totalUcana = int(this.getTotalValorNaBolsaUCANA()); // M1

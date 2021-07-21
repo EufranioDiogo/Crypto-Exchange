@@ -39,4 +39,8 @@ contract Token is StandardToken
     function balanceOfToken(address _owner) public view returns (uint256) {
         return balances[_owner];
     }
+
+    function getQuantOfToken(address _owner) public view returns (uint256) {
+        return balances[_owner];
+    }
 }

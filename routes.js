@@ -416,18 +416,14 @@ function routes(app, dbUsers, lms, accounts, web3) {
             const data = await dbUser.find({}).toArray();
 
             for (let i = 0; i < data.length; i++) {
-                const balanceToken1 = await exchangeContract.methods.getBalanceOfToken1().call({
+                const totalBalanceInfo = await exchangeContract.methods.getBalanceInfo().call({
                     from: data[i].idConta
                 });
-                const balanceToken2 = await exchangeContract.methods.getBalanceOfToken2().call({
-                    from: data[i].idConta
-                });
-                const balanceToken3 = await exchangeContract.methods.getBalanceOfToken3().call({
-                    from: data[i].idConta
-                });
-                data[i].ucana = balanceToken1;
-                data[i].ucanu = balanceToken2;
-                data[i].ucane = balanceToken3;
+                console.log(totalBalanceInfo)
+                data[i].ucana = totalBalanceInfo['2'];
+                data[i].ucanu = totalBalanceInfo['1'];
+                data[i].ucane = totalBalanceInfo['3'];
+                data[i].patrimonio = totalBalanceInfo['0'];
             }
 
 

@@ -26,11 +26,12 @@ const Dashboard = () => {
             ucana: 0.0,
             ucane: 0.0,
             ucanu: 0.0,
+            patrimonio: 0.0
         },
     });
 
     const fetchAllStudents = async() => {
-        setLoading(true);
+        //setLoading(true);
         try {
             const { data } = await api.get("/students");
             setStudents(data || []);
@@ -67,7 +68,7 @@ const Dashboard = () => {
                 getExchangeBalance();
             }
             setRealTime(new Date());
-        }, 60000);
+        }, 50000); // 5 MIN PARA ACTUALIZAR
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [realTime]);
 
